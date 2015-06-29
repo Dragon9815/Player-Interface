@@ -1,10 +1,11 @@
 package net.stegr.plim.block;
 
 import net.stegr.plim.item.upgrade.IUpgrade;
+import net.stegr.plim.tileentity.TileEntityUpgradeable;
 
 public interface IBlockUpgradeable
 {
-    void GetMaxUpgrades();
+    int getUpgradeSlots();
 
-    void doUpgrade(IUpgrade upgrade);
+    boolean doUpgrade(IUpgrade upgrade, TileEntityUpgradeable tileEntity);
 }

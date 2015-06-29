@@ -4,66 +4,59 @@ import net.minecraft.tileentity.TileEntity;
 import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.item.upgrade.ItemUpgradeBuffer;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public abstract class TileEntityUpgradeable extends TileEntity
 {
-    List<IUpgrade> installedUpgrades;
-    List<Class<? extends IUpgrade>> validUpgrades;
+    public Map<String, Integer> installedUpgrades;
+    public Map<String, Integer> validUpgrades;
 
     public TileEntityUpgradeable()
     {
         super();
 
-        validUpgrades = new LinkedList<Class<? extends IUpgrade>>();
-        installedUpgrades = new LinkedList<IUpgrade>();
+        installedUpgrades = new HashMap<String, Integer>();
+        validUpgrades = new HashMap<String, Integer>();
     }
 
     public boolean isUpgradeValid(IUpgrade upgrade)
     {
-        Iterator<Class<? extends IUpgrade>> it1 = this.validUpgrades.iterator();
-        Class<? extends IUpgrade> upgrade1;
-
-        while(it1.hasNext())
+        if(validUpgrades.containsKey(upgrade.getUpgradeID()))
         {
-            upgrade1 = it1.next();
-
-            if(upgrade.getClass().equals(upgrade1))
+            if(validUpgrades.get(upgrade.getUpgradeID()) > 0)
             {
-                return true;
+                if (installedUpgrades.containsKey(upgrade.getUpgradeID()))
+                {
+                    if (installedUpgrades.get(upgrade.getUpgradeID()) < validUpgrades.get(upgrade.getUpgradeID()))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
             }
-
         }
 
         return false;
     }
 
-    public boolean addUpgrade(IUpgrade upgrade)
+    public void addUpgrade(IUpgrade upgrade)
     {
-        Iterator<IUpgrade> it = this.installedUpgrades.iterator();
-        IUpgrade upgrade1;
-        int num = 0;
+        int var1 = 1;
 
-        while (it.hasNext())
+        if(installedUpgrades.containsKey(upgrade.getUpgradeID()))
         {
-            upgrade1 = it.next();
-
-            if(upgrade.getClass().equals(upgrade1.getClass()))
-            {
-                num++;
-            }
+            var1 += installedUpgrades.get(upgrade.getUpgradeID());
         }
 
-        if(num >= upgrade.getMaxUpgrades())
-        {
-            return false;
-        }
-
-        installedUpgrades.add(upgrade);
-        return true;
+        installedUpgrades.put(upgrade.getUpgradeID(), var1);
     }
 
+    public void onUpgrade(IUpgrade upgrade)
+    {
+
+    }
 
 }

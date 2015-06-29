@@ -1,5 +1,7 @@
 package net.stegr.plim.block;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -12,33 +14,38 @@ import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.item.upgrade.ItemUpgrade;
 import net.stegr.plim.tileentity.TileEntityPlayerInterface;
 import net.stegr.plim.tileentity.TileEntityUpgradeable;
+import net.stegr.plim.utility.LogHelper;
 
 
 public class BlockPlayerInterface extends BlockPlimTileEntity implements IBlockUpgradeable
 {
     public BlockPlayerInterface()
     {
-        super();
+        super(Material.iron);
         this.setBlockName("pl_interface");
         this.setBlockTextureName("pl_interface");
+
+        //this.setHarvestLevel("iron", 2);
+
+        this.setHardness(5.0F);
+        this.setResistance(10.0F);
+        this.setStepSound(soundTypeMetal);
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int p_149727_6_, float p_149727_7_, float p_149727_8_, float p_149727_9_)
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9)
     {
         TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
 
-        if(player.getHeldItem().getItem() instanceof ItemUpgrade)
+        if(player.getHeldItem() != null)
         {
-            ItemUpgrade item = (ItemUpgrade)player.getHeldItem().getItem();
-
-            if(te instanceof TileEntityUpgradeable)
+            if (player.getHeldItem().getItem() instanceof ItemUpgrade)
             {
-                TileEntityUpgradeable teup = (TileEntityUpgradeable)te;
+                ItemUpgrade item = (ItemUpgrade) player.getHeldItem().getItem();
 
-                if(teup.isUpgradeValid(item))
+                if (doUpgrade(item, te))
                 {
-                    teup.addUpgrade(item);
+                    player.getHeldItem().stackSize--;
                     return true;
                 }
             }
@@ -52,22 +59,8 @@ public class BlockPlayerInterface extends BlockPlimTileEntity implements IBlockU
                 {
                     te.boundPlayer = null;
                     te.markDirty();
-                    ChatComponentStyle s = new ChatComponentStyle()
-                    {
-                        @Override
-                        public String getUnformattedTextForChat()
-                        {
-                            return "Player Unbound";
-                        }
-
-                        @Override
-                        public IChatComponent createCopy()
-                        {
-                            return this;
-                        }
-                    };
                     player.addChatMessage(new ChatComponentText("Player unbound"));
-                    System.out.println("Player unbound");
+                    LogHelper.info("Player unbound");
                 }
             }
             else
@@ -77,7 +70,7 @@ public class BlockPlayerInterface extends BlockPlimTileEntity implements IBlockU
                     te.boundPlayer = player;
                     te.markDirty();
                     player.addChatMessage(new ChatComponentText("Player bound"));
-                    System.out.println("Player bound: " + player.getUniqueID().toString());
+                    LogHelper.info("Player bound: " + player.getUniqueID().toString());
                 }
             }
         }
@@ -92,14 +85,23 @@ public class BlockPlayerInterface extends BlockPlimTileEntity implements IBlockU
     }
 
     @Override
-    public void GetMaxUpgrades()
+    public int getUpgradeSlots()
     {
-
+        return 10;
     }
 
     @Override
-    public void doUpgrade(IUpgrade upgrade)
+    public boolean doUpgrade(IUpgrade upgrade, TileEntityUpgradeable tileEntity)
     {
+        if(tileEntity.installedUpgrades.size() < this.getUpgradeSlots())
+        {
+            if (tileEntity.isUpgradeValid(upgrade))
+            {
+                tileEntity.addUpgrade(upgrade);
+                return true;
+            }
+        }
 
+        return false;
     }
 }

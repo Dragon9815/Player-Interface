@@ -17,6 +17,7 @@ import buildcraft.api.transport.IInjectable;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.item.upgrade.ItemUpgradeBuffer;
+import net.stegr.plim.utility.UpgradeRegistry;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -45,7 +46,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         hasBuffer = false;
         bufferSlots = new ItemStack[9];
 
-        validUpgrades.add(ItemUpgradeBuffer.class);
+        validUpgrades.put(UpgradeRegistry.getUpgrade("buffer").getUpgradeID(), 1);
     }
 
     @Override
@@ -68,19 +69,18 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             }
         }
 
-
         int var1 = firstStackInBuffer();
-        if(var1 != -1)
+        if (var1 != -1)
         {
             ItemStack stack;
 
             stack = bufferSlots[var1].copy();
 
-            if(stack.stackSize > 0)
+            if (stack.stackSize > 0)
             {
                 stack.stackSize = 1;
 
-                if(boundPlayer.inventory.addItemStackToInventory(stack))
+                if (boundPlayer.inventory.addItemStackToInventory(stack))
                 {
                     bufferSlots[var1].stackSize--;
                 }
@@ -91,11 +91,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 bufferSlots[var1] = null;
             }
         }
-    }
-
-    public boolean doUpgrade(IUpgrade upgrade)
-    {
-        return true;
     }
 
     private int firstStackInBuffer()
@@ -271,6 +266,20 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         }
 
         par1.setString("boundPlayer", temp);
+
+        NBTTagCompound tag = new NBTTagCompound();
+
+        for(int i = 0; i < bufferSlots.length; i++)
+        {
+            NBTTagCompound tag1 = new NBTTagCompound();
+
+            if(bufferSlots[i] != null)
+                bufferSlots[i].writeToNBT(tag1);
+
+            tag.setTag("Slot_" + String.valueOf(i), tag1);
+        }
+
+        par1.setTag("Buffer_Slots", tag);
     }
 
     @Override
@@ -293,6 +302,11 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         else
         {
             boundPlayer = null;
+        }
+
+        if(par1.hasKey("Buffer_Slots"))
+        {
+
         }
     }
 
@@ -352,5 +366,14 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
         super.onDataPacket(net, packet);
         readFromNBT(packet.func_148857_g());
+    }
+
+    @Override
+    public void onUpgrade(IUpgrade upgrade)
+    {
+        if(upgrade.getUpgradeID().equals("buffer"))
+        {
+            hasBuffer = true;
+        }
     }
 }

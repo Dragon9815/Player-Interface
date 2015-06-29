@@ -10,6 +10,8 @@ import net.stegr.plim.init.ModBlocks;
 import net.stegr.plim.init.ModTileEntities;
 import net.stegr.plim.proxy.IProxy;
 import net.stegr.plim.reference.Reference;
+import net.stegr.plim.utility.LogHelper;
+import net.stegr.plim.utility.UpgradeRegistry;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME,version = Reference.VERSION)
 public class PlayerInterfaceMod
@@ -25,6 +27,7 @@ public class PlayerInterfaceMod
     {
         ModTileEntities.init();
         ModBlocks.init();
+        new UpgradeRegistry();
     }
 
     @EventHandler

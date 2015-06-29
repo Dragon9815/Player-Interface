@@ -7,6 +7,11 @@ import net.stegr.plim.tileentity.TileEntityUpgradeable;
 
 public class ItemUpgradeBuffer extends ItemUpgrade
 {
+    public ItemUpgradeBuffer()
+    {
+        super();
+    }
+
     @Override
     public int getMaxUpgrades()
     {
