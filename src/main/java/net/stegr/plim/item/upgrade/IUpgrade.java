@@ -1,11 +1,10 @@
 package net.stegr.plim.item.upgrade;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
 public interface IUpgrade
 {
-    void onUse();
-
-    void onTick();
-
     int getMaxUpgrades();
 
     String getUpgradeID();

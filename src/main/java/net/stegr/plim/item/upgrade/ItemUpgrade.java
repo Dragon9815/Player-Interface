@@ -6,8 +6,11 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.stegr.plim.reference.Reference;
+import net.stegr.plim.tileentity.TileEntityPlayerInterface;
+import net.stegr.plim.tileentity.TileEntityUpgradeable;
 
 public abstract class ItemUpgrade extends Item implements IUpgrade
 {
@@ -32,11 +35,5 @@ public abstract class ItemUpgrade extends Item implements IUpgrade
     public void registerIcons(IIconRegister iconRegister)
     {
         itemIcon = iconRegister.registerIcon(this.getUnwrappedUnlocalizedName(this.getUnlocalizedName()));
-    }
-
-    @Override
-    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int meta, float par8, float par9, float par10)
-    {
-        return false;
     }
 }

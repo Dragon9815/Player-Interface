@@ -16,17 +16,16 @@ import net.minecraft.tileentity.TileEntity;
 import buildcraft.api.transport.IInjectable;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.stegr.plim.item.upgrade.IUpgrade;
+import net.stegr.plim.item.upgrade.ItemUpgradeBuffer;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class TileEntityPlayerInterface extends TileEntity implements ISidedInventory
+public class TileEntityPlayerInterface extends TileEntityUpgradeable implements ISidedInventory
 {
     public EntityPlayer boundPlayer;
-
-    public List<IUpgrade> Upgrades;
 
     public boolean hasBuffer;
     public ItemStack[] bufferSlots;
@@ -46,7 +45,7 @@ public class TileEntityPlayerInterface extends TileEntity implements ISidedInven
         hasBuffer = false;
         bufferSlots = new ItemStack[9];
 
-        Upgrades = new LinkedList<IUpgrade>();
+        validUpgrades.add(ItemUpgradeBuffer.class);
     }
 
     @Override
@@ -96,7 +95,7 @@ public class TileEntityPlayerInterface extends TileEntity implements ISidedInven
 
     public boolean doUpgrade(IUpgrade upgrade)
     {
-
+        return true;
     }
 
     private int firstStackInBuffer()
