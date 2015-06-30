@@ -17,7 +17,7 @@ import net.stegr.plim.tileentity.TileEntityUpgradeable;
 import net.stegr.plim.utility.LogHelper;
 
 
-public class BlockPlayerInterface extends BlockPlimTileEntity implements IBlockUpgradeable
+public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable implements IBlockUpgradeable
 {
     public BlockPlayerInterface()
     {
@@ -35,46 +35,33 @@ public class BlockPlayerInterface extends BlockPlimTileEntity implements IBlockU
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9)
     {
-        TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
-
-        if(player.getHeldItem() != null)
+        if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9))
         {
-            if (player.getHeldItem().getItem() instanceof ItemUpgrade)
-            {
-                ItemUpgrade item = (ItemUpgrade) player.getHeldItem().getItem();
+            TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
-                if (doUpgrade(item, te))
+            if (!(player instanceof FakePlayer) && !world.isRemote)
+            {
+                if (player.isSneaking())
                 {
-                    player.getHeldItem().stackSize--;
-                    return true;
+                    if (te.boundPlayer != null)
+                    {
+                        te.boundPlayer = null;
+                        te.markDirty();
+                        player.addChatMessage(new ChatComponentText("Player unbound"));
+                        LogHelper.info("Player unbound");
+                    }
+                } else
+                {
+                    if (te.boundPlayer == null)
+                    {
+                        te.boundPlayer = player;
+                        te.markDirty();
+                        player.addChatMessage(new ChatComponentText("Player bound"));
+                        LogHelper.info("Player bound: " + player.getUniqueID().toString());
+                    }
                 }
             }
         }
-
-        if(!(player instanceof FakePlayer) && !world.isRemote)
-        {
-            if(player.isSneaking())
-            {
-                if(te.boundPlayer != null)
-                {
-                    te.boundPlayer = null;
-                    te.markDirty();
-                    player.addChatMessage(new ChatComponentText("Player unbound"));
-                    LogHelper.info("Player unbound");
-                }
-            }
-            else
-            {
-                if(te.boundPlayer == null)
-                {
-                    te.boundPlayer = player;
-                    te.markDirty();
-                    player.addChatMessage(new ChatComponentText("Player bound"));
-                    LogHelper.info("Player bound: " + player.getUniqueID().toString());
-                }
-            }
-        }
-
         return true;
     }
 

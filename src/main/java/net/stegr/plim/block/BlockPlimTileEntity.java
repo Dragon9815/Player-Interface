@@ -15,12 +15,12 @@ public abstract class BlockPlimTileEntity extends BlockContainer
     public BlockPlimTileEntity(Material material)
     {
         super(material);
+        this.setCreativeTab(CreativeTabPlim.PLIM_TAB);
     }
 
     public BlockPlimTileEntity()
     {
-        super(Material.rock);
-        this.setCreativeTab(CreativeTabPlim.PLIM_TAB);
+        this(Material.rock);
     }
 
     @Override

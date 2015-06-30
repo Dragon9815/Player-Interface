@@ -69,37 +69,43 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             }
         }
 
-        int var1 = firstStackInBuffer();
-        if (var1 != -1)
+        if(hasBuffer)
         {
-            ItemStack stack;
-
-            stack = bufferSlots[var1].copy();
-
-            if (stack.stackSize > 0)
+            int var1 = firstStackInBuffer();
+            if (var1 != -1)
             {
-                stack.stackSize = 1;
+                ItemStack stack;
 
-                if (boundPlayer.inventory.addItemStackToInventory(stack))
+                stack = bufferSlots[var1].copy();
+
+                if (stack.stackSize > 0)
                 {
-                    bufferSlots[var1].stackSize--;
-                }
-            }
+                    stack.stackSize = 1;
 
-            if (bufferSlots[var1].stackSize <= 0)
-            {
-                bufferSlots[var1] = null;
+                    if (boundPlayer.inventory.addItemStackToInventory(stack))
+                    {
+                        bufferSlots[var1].stackSize--;
+                    }
+                }
+
+                if (bufferSlots[var1].stackSize <= 0)
+                {
+                    bufferSlots[var1] = null;
+                }
             }
         }
     }
 
     private int firstStackInBuffer()
     {
-        for (int i = 0; i < this.bufferSlots.length; ++i)
+        if(hasBuffer)
         {
-            if (this.bufferSlots[i] != null)
+            for (int i = 0; i < this.bufferSlots.length; ++i)
             {
-                return i;
+                if (this.bufferSlots[i] != null)
+                {
+                    return i;
+                }
             }
         }
 
@@ -116,7 +122,10 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             size += boundPlayer.inventory.getSizeInventory();
         }
 
-        size += this.bufferSlots.length;
+        if(hasBuffer)
+        {
+            size += this.bufferSlots.length;
+        }
 
         return size;
     }
@@ -131,7 +140,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             throw new IllegalArgumentException("Slot number can't be negative!");
         }
 
-        if(slot < this.bufferSlots.length)
+        if(slot < this.bufferSlots.length && hasBuffer)
         {
             var1 = bufferSlots[slot];
         }
@@ -139,7 +148,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         {
             if (boundPlayer != null)
             {
-                var1 = boundPlayer.inventory.getStackInSlot(slot - this.bufferSlots.length);
+                var1 = boundPlayer.inventory.getStackInSlot(slot - ((hasBuffer) ? this.bufferSlots.length : 0));
             }
         }
 
@@ -151,7 +160,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         ItemStack[] itemStacks = null;
 
-        if(slot < this.bufferSlots.length)
+        if(slot < this.bufferSlots.length && hasBuffer)
         {
             if(itemStacks[slot] != null)
             {
@@ -180,7 +189,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         {
             if (boundPlayer != null)
             {
-                return boundPlayer.inventory.decrStackSize(slot - this.bufferSlots.length, par2);
+                return boundPlayer.inventory.decrStackSize(slot - ((hasBuffer) ? this.bufferSlots.length : 0), par2);
             }
         }
 
@@ -198,7 +207,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         ItemStack[] itemStacks = this.bufferSlots;
 
-        if(slot < this.bufferSlots.length)
+        if(slot < this.bufferSlots.length && hasBuffer)
         {
             itemStacks[slot] = itemStack;
         }
@@ -206,7 +215,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         {
             if (boundPlayer != null)
             {
-                boundPlayer.inventory.setInventorySlotContents(slot - this.bufferSlots.length, itemStack);
+                boundPlayer.inventory.setInventorySlotContents(slot - ((hasBuffer) ? this.bufferSlots.length : 0), itemStack);
             }
         }
     }

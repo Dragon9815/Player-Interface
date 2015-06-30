@@ -10,12 +10,9 @@ public class ItemUpgradeBuffer extends ItemUpgrade
     public ItemUpgradeBuffer()
     {
         super();
-    }
 
-    @Override
-    public int getMaxUpgrades()
-    {
-        return 1;
+        this.setUnlocalizedName("upgrade_buffer");
+        this.setTextureName("upgrade_buffer");
     }
 
     @Override

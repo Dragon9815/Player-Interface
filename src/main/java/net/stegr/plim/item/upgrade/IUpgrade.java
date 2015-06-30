@@ -5,7 +5,5 @@ import net.minecraft.world.World;
 
 public interface IUpgrade
 {
-    int getMaxUpgrades();
-
     String getUpgradeID();
 }

@@ -7,6 +7,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import net.stegr.plim.init.ModBlocks;
+import net.stegr.plim.init.ModItems;
 import net.stegr.plim.init.ModTileEntities;
 import net.stegr.plim.proxy.IProxy;
 import net.stegr.plim.reference.Reference;
@@ -27,7 +28,10 @@ public class PlayerInterfaceMod
     {
         ModTileEntities.init();
         ModBlocks.init();
+        ModItems.init();
         new UpgradeRegistry();
+
+        UpgradeRegistry.registerUpgrade(ModItems.BufferUpgrade);
     }
 
     @EventHandler
