@@ -4,14 +4,14 @@ import net.minecraft.block.BlockFurnace;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.world.World;
 import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.item.upgrade.ItemUpgrade;
 import net.stegr.plim.item.upgrade.ItemUpgradeBuffer;
+import net.stegr.plim.utility.LogHelper;
 import net.stegr.plim.utility.UpgradeRegistry;
 
 import javax.swing.text.html.parser.Entity;
@@ -59,6 +59,7 @@ public abstract class TileEntityUpgradeable extends TileEntity
 
         if(installedUpgrades.containsKey(upgrade.getUpgradeID()))
         {
+            LogHelper.info("var1: " + installedUpgrades.get(upgrade.getUpgradeID()));
             var1 += installedUpgrades.get(upgrade.getUpgradeID());
         }
 
@@ -67,10 +68,7 @@ public abstract class TileEntityUpgradeable extends TileEntity
         onUpgrade(upgrade);
     }
 
-    public void onUpgrade(IUpgrade upgrade)
-    {
-
-    }
+    public abstract void onUpgrade(IUpgrade upgrade);
 
     public void dropAllUpgrades(World world, int x, int y, int z)
     {
@@ -123,35 +121,40 @@ public abstract class TileEntityUpgradeable extends TileEntity
     @Override
     public void readFromNBT(NBTTagCompound tag)
     {
-        Set keySet;
+        super.readFromNBT(tag);
+
+        installedUpgrades.clear();
 
         if(tag.hasKey("Upgrades"))
         {
-            NBTTagCompound tag1 = (NBTTagCompound)tag.getTag("Upgrades");
+            NBTTagList tagList = tag.getTagList("Upgrades", 10);
 
-            keySet = tag.func_150296_c();
-            Iterator it = keySet.iterator();
-
-            while (it.hasNext())
+            for(int i = 0; i < tagList.tagCount(); i++)
             {
-                Object key = keySet.iterator().next();
+                NBTTagCompound tag1 = tagList.getCompoundTagAt(i);
 
-                if(key instanceof NBTTagCompound)
+                LogHelper.info(i);
+
+                if(tag1.hasKey("name") && tag1.hasKey("count"))
                 {
+                    installedUpgrades.put(tag1.getString("name"), tag1.getInteger("count"));
+                    LogHelper.info("name: " + tag1.getString("name") + ", count: " + String.valueOf(tag1.getInteger("count")));
+                }
+                else
+                {
+                    LogHelper.fatal("Something messed up my NBT!");
                 }
             }
-
-
-
         }
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag)
     {
+        super.writeToNBT(tag);
         Set<String> keySet = installedUpgrades.keySet();
         Iterator<String> it1 = keySet.iterator();
-        NBTTagCompound tag1 = new NBTTagCompound();
+        NBTTagList tag1 = new NBTTagList();
         int i = 0;
 
         while(it1.hasNext())
@@ -160,10 +163,12 @@ public abstract class TileEntityUpgradeable extends TileEntity
             int count = installedUpgrades.get(key);
             NBTTagCompound tag2 = new NBTTagCompound();
 
+            //tag2.appendTag(new NBTTagString(key));
+            //tag2.appendTag(new NBTTagInt(count));
             tag2.setString("name", key);
             tag2.setInteger("count", count);
 
-            tag1.setTag(String.valueOf(i), tag2);
+            tag1.appendTag(tag2);
             i++;
         }
 

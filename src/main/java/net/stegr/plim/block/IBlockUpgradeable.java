@@ -6,6 +6,4 @@ import net.stegr.plim.tileentity.TileEntityUpgradeable;
 public interface IBlockUpgradeable
 {
     int getUpgradeSlots();
-
-    boolean doUpgrade(IUpgrade upgrade, TileEntityUpgradeable tileEntity);
 }

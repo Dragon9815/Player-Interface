@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.item.upgrade.ItemUpgrade;
 import net.stegr.plim.tileentity.TileEntityPlayerInterface;
 import net.stegr.plim.tileentity.TileEntityUpgradeable;
@@ -23,19 +24,21 @@ public abstract class BlockPlimTileEntityUpgradeable extends BlockPlimTileEntity
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9)
     {
-        TileEntityUpgradeable te = (TileEntityUpgradeable)world.getTileEntity(x, y, z);
-
-        if(player.getHeldItem() != null)
+        if(!world.isRemote)
         {
-            if (player.getHeldItem().getItem() instanceof ItemUpgrade)
-            {
-                ItemUpgrade item = (ItemUpgrade) player.getHeldItem().getItem();
+            TileEntityUpgradeable te = (TileEntityUpgradeable) world.getTileEntity(x, y, z);
 
-                if (te.isUpgradeValid(item))
+            if (player.getHeldItem() != null)
+            {
+                if (player.getHeldItem().getItem() instanceof ItemUpgrade)
                 {
-                    te.addUpgrade(item);
-                    player.getHeldItem().stackSize--;
-                    return true;
+                    ItemUpgrade item = (ItemUpgrade) player.getHeldItem().getItem();
+
+                    if (this.doUpgrade(item, te))
+                    {
+                        player.getHeldItem().stackSize--;
+                        return true;
+                    }
                 }
             }
         }
@@ -51,5 +54,19 @@ public abstract class BlockPlimTileEntityUpgradeable extends BlockPlimTileEntity
         te.dropAllUpgrades(world, x, y, z);
 
         super.breakBlock(world, x, y, z, block, meta);
+    }
+
+    public boolean doUpgrade(IUpgrade upgrade, TileEntityUpgradeable tileEntity)
+    {
+        if (tileEntity.installedUpgrades.size() < this.getUpgradeSlots())
+        {
+            if (tileEntity.isUpgradeValid(upgrade))
+            {
+                tileEntity.addUpgrade(upgrade);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

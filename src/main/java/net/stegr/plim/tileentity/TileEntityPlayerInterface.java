@@ -17,6 +17,7 @@ import buildcraft.api.transport.IInjectable;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.item.upgrade.ItemUpgradeBuffer;
+import net.stegr.plim.utility.LogHelper;
 import net.stegr.plim.utility.UpgradeRegistry;
 
 import java.util.Iterator;
@@ -64,9 +65,12 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 if (p.getUniqueID().equals(UUID.fromString(uuid)))
                 {
                     boundPlayer = p;
-                    return;
+                    LogHelper.info("Successfully rebound player!");
                 }
             }
+
+            uuid = "";
+            bindPlayer = false;
         }
 
         if(hasBuffer)
@@ -82,9 +86,12 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 {
                     stack.stackSize = 1;
 
-                    if (boundPlayer.inventory.addItemStackToInventory(stack))
+                    if(boundPlayer != null)
                     {
-                        bufferSlots[var1].stackSize--;
+                        if (boundPlayer.inventory.addItemStackToInventory(stack))
+                        {
+                            bufferSlots[var1].stackSize--;
+                        }
                     }
                 }
 
@@ -276,7 +283,9 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         par1.setString("boundPlayer", temp);
 
-        NBTTagCompound tag = new NBTTagCompound();
+        par1.setBoolean("hasBuffer", hasBuffer);
+
+        /*NBTTagCompound tag = new NBTTagCompound();
 
         for(int i = 0; i < bufferSlots.length; i++)
         {
@@ -288,13 +297,14 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             tag.setTag("Slot_" + String.valueOf(i), tag1);
         }
 
-        par1.setTag("Buffer_Slots", tag);
+        par1.setTag("Buffer_Slots", tag);*/
     }
 
     @Override
     public void readFromNBT(NBTTagCompound par1)
     {
-        super.readFromNBT(par1);
+        NBTTagCompound var1 = (NBTTagCompound)par1.copy();
+        super.readFromNBT(var1);
 
         String id;
 
@@ -302,6 +312,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         if(id != null)
         {
+            LogHelper.info("uuid: " + id);
             if(!id.equals(""))
             {
                 uuid = id;
@@ -313,10 +324,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             boundPlayer = null;
         }
 
-        if(par1.hasKey("Buffer_Slots"))
-        {
-
-        }
+        if(par1.hasKey("hasBuffer"))
+            hasBuffer = par1.getBoolean("hasBuffer");
     }
 
     @Override
@@ -335,7 +344,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_)
     {
-        getDescriptionPacket();
+        //getDescriptionPacket();
         return true;
     }
 
