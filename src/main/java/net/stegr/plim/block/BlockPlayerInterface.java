@@ -35,7 +35,7 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9)
     {
-        if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9) && !world.isRemote)
+        if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9))
         {
             TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
@@ -43,12 +43,18 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
             {
                 if (player.isSneaking())
                 {
-                    if (te.boundPlayer != null && player.getUniqueID().equals(te.boundPlayer.getUniqueID()))
+                    if (te.boundPlayer != null)
                     {
                         te.boundPlayer = null;
+                        //te.markDirty();
+                        //te.getDescriptionPacket();
+                        te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
                         te.markDirty();
-                        player.addChatMessage(new ChatComponentText("Player unbound"));
-                        LogHelper.info("Player unbound");
+                        if(!world.isRemote)
+                        {
+                            player.addChatMessage(new ChatComponentText("Player unbound"));
+                            LogHelper.info("Player unbound");
+                        }
                     }
                 }
                 else
@@ -56,9 +62,13 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
                     if (te.boundPlayer == null)
                     {
                         te.boundPlayer = player;
+                        te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
                         te.markDirty();
-                        player.addChatMessage(new ChatComponentText("Player bound"));
-                        LogHelper.info("Player bound: " + player.getUniqueID().toString());
+                        if(!world.isRemote)
+                        {
+                            player.addChatMessage(new ChatComponentText("Player bound"));
+                            LogHelper.info("Player bound: " + player.getUniqueID().toString());
+                        }
                     }
                 }
             }
