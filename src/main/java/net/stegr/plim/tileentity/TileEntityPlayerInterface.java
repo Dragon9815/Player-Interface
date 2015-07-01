@@ -53,7 +53,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public void updateEntity()
     {
-        if(bindPlayer)
+        if(bindPlayer && !this.worldObj.isRemote)
         {
             Iterator it = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
             EntityPlayer p;
@@ -308,20 +308,21 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         String id;
 
-        id = par1.getString("boundPlayer");
-
-        if(id != null)
+        if(par1.hasKey("boundPlayer"))
         {
+            id = par1.getString("boundPlayer");
+
             LogHelper.info("uuid: " + id);
-            if(!id.equals(""))
+            LogHelper.info(this.hasWorldObj());
+            if (!id.equals(""))
             {
                 uuid = id;
                 bindPlayer = true;
             }
-        }
-        else
-        {
-            boundPlayer = null;
+            else
+            {
+                boundPlayer = null;
+            }
         }
 
         if(par1.hasKey("hasBuffer"))
@@ -344,7 +345,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_)
     {
-        //getDescriptionPacket();
+        getDescriptionPacket();
         return true;
     }
 
@@ -375,8 +376,11 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
     @Override
     public Packet getDescriptionPacket() {
+        super.getDescriptionPacket();
         NBTTagCompound tag = new NBTTagCompound();
         this.writeToNBT(tag);
+
+        LogHelper.info("xxxxx " + tag.getString("boundPlayer"));
         return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag);
     }
 

@@ -123,7 +123,7 @@ public abstract class TileEntityUpgradeable extends TileEntity
     {
         super.readFromNBT(tag);
 
-        installedUpgrades.clear();
+        /*installedUpgrades.clear();
 
         if(tag.hasKey("Upgrades"))
         {
@@ -145,14 +145,14 @@ public abstract class TileEntityUpgradeable extends TileEntity
                     LogHelper.fatal("Something messed up my NBT!");
                 }
             }
-        }
+        }*/
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag)
     {
         super.writeToNBT(tag);
-        Set<String> keySet = installedUpgrades.keySet();
+        /*Set<String> keySet = installedUpgrades.keySet();
         Iterator<String> it1 = keySet.iterator();
         NBTTagList tag1 = new NBTTagList();
         int i = 0;
@@ -172,7 +172,7 @@ public abstract class TileEntityUpgradeable extends TileEntity
             i++;
         }
 
-        tag.setTag("Upgrades", tag1);
+        tag.setTag("Upgrades", tag1);*/
     }
 
 }
