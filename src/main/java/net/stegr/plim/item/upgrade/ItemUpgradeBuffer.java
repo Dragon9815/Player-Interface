@@ -20,4 +20,11 @@ public class ItemUpgradeBuffer extends ItemUpgrade
     {
         return "buffer";
     }
+
+    @Override
+    public String[] getPrerequisites()
+    {
+        String[] s = {"transfer"};
+        return s;
+    }
 }

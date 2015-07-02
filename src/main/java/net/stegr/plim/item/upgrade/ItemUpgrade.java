@@ -19,4 +19,10 @@ public abstract class ItemUpgrade extends ItemPlim implements IUpgrade
     {
         super();
     }
+
+    @Override
+    public String[] getPrerequisites()
+    {
+        return null;
+    }
 }

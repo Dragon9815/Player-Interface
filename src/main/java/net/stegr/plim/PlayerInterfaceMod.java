@@ -32,6 +32,7 @@ public class PlayerInterfaceMod
         new UpgradeRegistry();
 
         UpgradeRegistry.registerUpgrade(ModItems.BufferUpgrade);
+        UpgradeRegistry.registerUpgrade(ModItems.TransferUpgrade);
     }
 
     @EventHandler

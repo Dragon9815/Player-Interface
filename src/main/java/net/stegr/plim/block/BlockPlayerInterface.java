@@ -35,7 +35,7 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9)
     {
-        if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9))
+        if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9) && !world.isRemote)
         {
             TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
@@ -43,9 +43,9 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
             {
                 if (player.isSneaking())
                 {
-                    if (te.boundPlayer != null)
+                    if (te.getBoundPlayer() != null && te.getBoundPlayer().getUniqueID().equals(player.getUniqueID()))
                     {
-                        te.boundPlayer = null;
+                        te.bindPlayer(null);
                         //te.markDirty();
                         //te.getDescriptionPacket();
                         te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
@@ -59,9 +59,9 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
                 }
                 else
                 {
-                    if (te.boundPlayer == null)
+                    if (te.getBoundPlayer() == null)
                     {
-                        te.boundPlayer = player;
+                        te.bindPlayer(player);
                         te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
                         te.markDirty();
                         if(!world.isRemote)

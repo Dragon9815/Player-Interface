@@ -8,6 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
@@ -28,13 +29,15 @@ import java.util.UUID;
 
 public class TileEntityPlayerInterface extends TileEntityUpgradeable implements ISidedInventory
 {
-    public EntityPlayer boundPlayer;
+    private EntityPlayer boundPlayer;
 
     public boolean hasBuffer;
     public ItemStack[] bufferSlots;
 
     private boolean bindPlayer;
     private String uuid;
+
+    private boolean doesTransfer;
 
     public TileEntityPlayerInterface()
     {
@@ -48,19 +51,16 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         hasBuffer = false;
         bufferSlots = new ItemStack[9];
 
+        doesTransfer = false;
+
         validUpgrades.put(UpgradeRegistry.getUpgrade("buffer").getUpgradeID(), 1);
+        validUpgrades.put(UpgradeRegistry.getUpgrade("transfer").getUpgradeID(), 1);
     }
 
     @Override
     public void updateEntity()
     {
-        if(boundPlayer != null)
-        {
-            LogHelper.info(boundPlayer.getUniqueID());
-            LogHelper.info(worldObj.isRemote);
-        }
-
-        if(bindPlayer)
+        if(bindPlayer && !worldObj.isRemote)
         {
             Iterator it = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
             EntityPlayer p;
@@ -71,16 +71,15 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
                 if (p.getUniqueID().equals(UUID.fromString(uuid)))
                 {
-                    boundPlayer = p;
+                    bindPlayer(p);
                     LogHelper.info("Successfully rebound player!");
+                    uuid = "";
+                    bindPlayer = false;
                 }
             }
-
-            uuid = "";
-            bindPlayer = false;
         }
 
-        /*if(hasBuffer)
+        if(hasBuffer && doesTransfer)
         {
             int var1 = firstStackInBuffer();
             if (var1 != -1)
@@ -107,7 +106,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                     bufferSlots[var1] = null;
                 }
             }
-        }*/
+        }
     }
 
     private int firstStackInBuffer()
@@ -131,7 +130,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         int size = 0;
 
-        if(boundPlayer != null)
+        if(boundPlayer != null && doesTransfer)
         {
             size += boundPlayer.inventory.getSizeInventory();
         }
@@ -160,7 +159,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         }
         else
         {
-            if (boundPlayer != null)
+            if (boundPlayer != null && doesTransfer)
             {
                 var1 = boundPlayer.inventory.getStackInSlot(slot - ((hasBuffer) ? this.bufferSlots.length : 0));
             }
@@ -201,7 +200,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         }
         else
         {
-            if (boundPlayer != null)
+            if (boundPlayer != null && doesTransfer)
             {
                 return boundPlayer.inventory.decrStackSize(slot - ((hasBuffer) ? this.bufferSlots.length : 0), par2);
             }
@@ -227,7 +226,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         }
         else
         {
-            if (boundPlayer != null)
+            if (boundPlayer != null && doesTransfer)
             {
                 boundPlayer.inventory.setInventorySlotContents(slot - ((hasBuffer) ? this.bufferSlots.length : 0), itemStack);
             }
@@ -290,9 +289,10 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         par1.setString("boundPlayer", temp);
 
-        /*par1.setBoolean("hasBuffer", hasBuffer);
+        par1.setBoolean("hasBuffer", hasBuffer);
+        par1.setBoolean("doesTransfer", doesTransfer);
 
-        NBTTagCompound tag = new NBTTagCompound();
+        NBTTagList tag = new NBTTagList();
 
         for(int i = 0; i < bufferSlots.length; i++)
         {
@@ -301,10 +301,10 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             if(bufferSlots[i] != null)
                 bufferSlots[i].writeToNBT(tag1);
 
-            tag.setTag("Slot_" + String.valueOf(i), tag1);
+            tag.appendTag(tag1);
         }
 
-        par1.setTag("Buffer_Slots", tag);*/
+        par1.setTag("Buffer_Slots", tag);
     }
 
     @Override
@@ -319,8 +319,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         {
             id = par1.getString("boundPlayer");
 
-            LogHelper.info("uuid: " + id);
-            LogHelper.info(this.hasWorldObj());
             if (!id.equals(""))
             {
                 uuid = id;
@@ -334,6 +332,21 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         if(par1.hasKey("hasBuffer"))
             hasBuffer = par1.getBoolean("hasBuffer");
+
+        if(par1.hasKey("doesTransfer"))
+            doesTransfer = par1.getBoolean("doesTransfer");
+
+        if(par1.hasKey("Buffer_Slots"))
+        {
+            NBTTagList tagList = par1.getTagList("Buffer_Slots", 10);
+
+            for(int i = 0; i < tagList.tagCount() && i < bufferSlots.length; i++)
+            {
+                NBTTagCompound tag = tagList.getCompoundTagAt(i);
+
+                bufferSlots[i] = ItemStack.loadItemStackFromNBT(tag);
+            }
+        }
     }
 
     @Override
@@ -352,7 +365,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_)
     {
-        //getDescriptionPacket();
         return true;
     }
 
@@ -362,41 +374,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         return true;
     }
 
-    /*@Override
-    public boolean canInjectItems(ForgeDirection forgeDirection)
-    {
-        return true;
-    }
-
-    @Override
-    public int injectItem(ItemStack itemStack, boolean b, ForgeDirection forgeDirection, EnumColor enumColor)
-    {
-        if(boundPlayer.inventory.addItemStackToInventory(itemStack))
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }*/
-
-    @Override
-    public Packet getDescriptionPacket() {
-        NBTTagCompound tag = new NBTTagCompound();
-        writeToNBT(tag);
-
-        LogHelper.info("xxxxxxx: " + tag.getString("boundPlayer"));
-
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        super.onDataPacket(net, packet);
-        readFromNBT(packet.func_148857_g());
-    }
-
     @Override
     public void onUpgrade(IUpgrade upgrade)
     {
@@ -404,5 +381,19 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         {
             hasBuffer = true;
         }
+        else if(upgrade.getUpgradeID().equals("transfer"))
+        {
+            doesTransfer = true;
+        }
+    }
+
+    public void bindPlayer(EntityPlayer player)
+    {
+        boundPlayer = player;
+    }
+
+    public EntityPlayer getBoundPlayer()
+    {
+        return this.boundPlayer;
     }
 }

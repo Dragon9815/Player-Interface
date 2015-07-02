@@ -6,4 +6,6 @@ import net.minecraft.world.World;
 public interface IUpgrade
 {
     String getUpgradeID();
+
+    String[] getPrerequisites();
 }
