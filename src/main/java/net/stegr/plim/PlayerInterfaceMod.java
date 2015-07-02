@@ -2,10 +2,13 @@ package net.stegr.plim;
 
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.stegr.plim.init.ModBlocks;
 import net.stegr.plim.init.ModItems;
 import net.stegr.plim.init.ModTileEntities;
@@ -33,6 +36,10 @@ public class PlayerInterfaceMod
 
         UpgradeRegistry.registerUpgrade(ModItems.BufferUpgrade);
         UpgradeRegistry.registerUpgrade(ModItems.TransferUpgrade);
+
+        GameRegistry.addShapedRecipe(new ItemStack(ModBlocks.player_interface), "GDG", "DID", "GDG", 'G', Items.gold_ingot, 'D', Items.diamond, 'I', Blocks.iron_block);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.BufferUpgrade), "SIS", "GCG", "SIS", 'S', Blocks.stone, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'C', Blocks.chest);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.TransferUpgrade), "SIS", "GHG", "SIS", 'S', Blocks.stone, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'H', Blocks.hopper);
     }
 
     @EventHandler
