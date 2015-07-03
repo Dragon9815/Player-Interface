@@ -272,7 +272,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_)
     {
-        return true;
+        return doesTransfer;
     }
 
     @Override
@@ -365,7 +365,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_)
     {
-        return true;
+        return doesTransfer;
     }
 
     @Override
