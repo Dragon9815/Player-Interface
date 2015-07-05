@@ -2,7 +2,10 @@ package net.stegr.plim.tileentity;
 
 import com.sun.xml.internal.ws.client.dispatch.PacketDispatch;
 import com.sun.xml.internal.ws.commons.xmlutil.Converter;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -14,8 +17,11 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.stegr.plim.item.upgrade.IUpgrade;
+import net.stegr.plim.network.DescriptionHandler;
+import net.stegr.plim.reference.Reference;
 import net.stegr.plim.utility.LogHelper;
 import net.stegr.plim.utility.UpgradeRegistry;
+import org.lwjgl.BufferUtils;
 
 import java.util.Iterator;
 import java.util.UUID;
@@ -70,6 +76,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                     bindPlayer = false;
                 }
             }
+
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
         }
 
         if(hasBuffer && doesTransfer)
@@ -272,13 +280,15 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound par1)
+    public void writeToNBT(NBTTagCompound tag)
     {
-        super.writeToNBT(par1);
+        super.writeToNBT(tag);
 
-        this.writeSyncableData(par1);
+        tag.setBoolean("hasBuffer", this.hasBuffer);
+        tag.setBoolean("doesTransfer", this.doesTransfer);
+        tag.setString("boundPlayer", (boundPlayer != null) ? boundPlayer.getUniqueID().toString() : "");
 
-        NBTTagList tag = new NBTTagList();
+        NBTTagList tagList = new NBTTagList();
 
         for(int i = 0; i < bufferSlots.length; i++)
         {
@@ -287,45 +297,43 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             if(bufferSlots[i] != null)
                 bufferSlots[i].writeToNBT(tag1);
 
-            tag.appendTag(tag1);
+            tagList.appendTag(tag1);
         }
 
-        par1.setTag("Buffer_Slots", tag);
+        tag.setTag("Buffer_Slots", tag);
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound par1)
+    public void readFromNBT(NBTTagCompound tag)
     {
-        super.readFromNBT(par1);
+        super.readFromNBT(tag);
 
-        this.readSyncableData(par1);
+        this.hasBuffer = tag.getBoolean("hasBuffer");
+        this.doesTransfer = tag.getBoolean("doesTransfer");
 
-        if(par1.hasKey("Buffer_Slots"))
+        String uuid = tag.getString("boundPlayer");
+
+        if(!uuid.equals(""))
         {
-            NBTTagList tagList = par1.getTagList("Buffer_Slots", 10);
+            bindPlayer = true;
+            this.uuid = uuid;
+        }
+        else
+        {
+            this.boundPlayer = null;
+        }
+
+        if(tag.hasKey("Buffer_Slots"))
+        {
+            NBTTagList tagList = tag.getTagList("Buffer_Slots", 10);
 
             for(int i = 0; i < tagList.tagCount() && i < bufferSlots.length; i++)
             {
-                NBTTagCompound tag = tagList.getCompoundTagAt(i);
+                NBTTagCompound tag1 = tagList.getCompoundTagAt(i);
 
-                bufferSlots[i] = ItemStack.loadItemStackFromNBT(tag);
+                bufferSlots[i] = ItemStack.loadItemStackFromNBT(tag1);
             }
         }
-    }
-
-    public void SyncWriteToNBT(NBTTagCompound tag)
-    {
-        tag.setBoolean("hasBuffer", hasBuffer);
-        tag.setBoolean("doesTransfer", doesTransfer);
-
-        tag.setString("boundPlayer", boundPlayer.getUniqueID().toString());
-    }
-
-    public void SyncReadFromNBT(NBTTagCompound tag)
-    {
-        hasBuffer = tag.getBoolean("hasBuffer");
-        doesTransfer = tag.getBoolean("doesTransfer");
-        uuid = tag.getString("boundPlayer");
     }
 
     @Override
@@ -364,11 +372,13 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         {
             doesTransfer = true;
         }
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
     public void bindPlayer(EntityPlayer player)
     {
         boundPlayer = player;
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
     public EntityPlayer getBoundPlayer()
@@ -379,43 +389,30 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        if(pkt.func_148853_f() == 64)
-        {
-            this.readSyncableData(pkt.func_148857_g());
-        }
+        super.onDataPacket(net, pkt);
     }
 
     public Packet getDescriptionPacket()
     {
-        NBTTagCompound tag = new NBTTagCompound();
+        ByteBuf buf = Unpooled.buffer();
 
-        writeSyncableData(tag);
+        buf.writeInt(xCoord);
+        buf.writeInt(yCoord);
+        buf.writeInt(zCoord);
 
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 64, tag);
+        writeToPacket(buf);
+        return new FMLProxyPacket(buf, DescriptionHandler.CHANNEL);
     }
 
-    public final void writeSyncableData(NBTTagCompound tag)
+    protected void writeToPacket(ByteBuf buf)
     {
-        tag.setBoolean("hasBuffer", this.hasBuffer);
-        tag.setBoolean("doesTransfer", this.doesTransfer);
-        tag.setString("boundPlayer", (boundPlayer != null) ? boundPlayer.getUniqueID().toString() : "");
+        ByteBufUtils.writeUTF8String(buf, ((boundPlayer != null) ? boundPlayer.getUniqueID().toString() : ""));
+        buf.writeBoolean(this.hasBuffer);
+        buf.writeBoolean(this.doesTransfer);
     }
 
-    public final void readSyncableData(NBTTagCompound tag)
+    public void readFromPacket(ByteBuf buf)
     {
-        this.hasBuffer = tag.getBoolean("hasBuffer");
-        this.doesTransfer = tag.getBoolean("doesTransfer");
 
-        String uuid = tag.getString("boundPlayer");
-
-        if(!uuid.equals(""))
-        {
-            bindPlayer = true;
-            this.uuid = uuid;
-        }
-        else
-        {
-            this.boundPlayer = null;
-        }
     }
 }

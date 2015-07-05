@@ -13,6 +13,8 @@ import net.stegr.plim.init.ModBlocks;
 import net.stegr.plim.init.ModItems;
 import net.stegr.plim.init.ModTileEntities;
 import net.stegr.plim.integration.Waila;
+import net.stegr.plim.network.DescriptionHandler;
+import net.stegr.plim.proxy.CommonProxy;
 import net.stegr.plim.proxy.IProxy;
 import net.stegr.plim.reference.Reference;
 import net.stegr.plim.utility.LogHelper;
@@ -25,7 +27,7 @@ public class PlayerInterfaceMod
     public static  PlayerInterfaceMod instance;
 
     @SidedProxy(clientSide = Reference.CLIENT_PROXY_CLASS, serverSide =  Reference.SERVER_PROXY_CLASS)
-    public static IProxy proxy;
+    public static CommonProxy proxy;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -33,6 +35,7 @@ public class PlayerInterfaceMod
         ModTileEntities.init();
         ModBlocks.init();
         ModItems.init();
+        DescriptionHandler.init();
         new UpgradeRegistry();
 
         UpgradeRegistry.registerUpgrade(ModItems.BufferUpgrade);
