@@ -22,11 +22,18 @@ group= "net.stegr.plim" // http://maven.apache.org/guides/mini/guide-naming-conv
 archivesBaseName = "plim"
 
 minecraft {
-    version = "1.7.10-10.13.3.1388-1.7.10"
+    version = "1.7.10-10.13.4.1448-1.7.10"
     runDir = "eclipse"
 }
 
 dependencies {
+	
+	//mods "mcp.mobius.waila:Waila:1.5.10_1.7.10:dev"
+	
+	//compile "mcp.mobius.waila:Waila:${waila_version}_${minecraft_version}:dev"
+	
+	compile files ("./libs/Waila-${waila_version}_${minecraft_version}.jar")
+	
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

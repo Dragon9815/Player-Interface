@@ -1,9 +1,11 @@
 package net.stegr.plim.block;
 
+import cofh.api.block.IDismantleable;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentStyle;
 import net.minecraft.util.ChatComponentText;
@@ -15,9 +17,15 @@ import net.stegr.plim.item.upgrade.ItemUpgrade;
 import net.stegr.plim.tileentity.TileEntityPlayerInterface;
 import net.stegr.plim.tileentity.TileEntityUpgradeable;
 import net.stegr.plim.utility.LogHelper;
+import net.stegr.plim.utility.UpgradeRegistry;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
-public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable implements IBlockUpgradeable
+public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable implements IBlockUpgradeable, IDismantleable
 {
     public BlockPlayerInterface()
     {
@@ -89,4 +97,37 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     }
 
 
+    @Override
+    public ArrayList<ItemStack> dismantleBlock(EntityPlayer player, World world, int x, int y, int z, boolean returnDrops)
+    {
+        ArrayList<ItemStack> retStacks = new ArrayList<ItemStack>();
+        Map<String, Integer> upgrades;
+        TileEntity te = world.getTileEntity(x, y, z);
+
+        if(te instanceof  TileEntityPlayerInterface)
+        {
+            TileEntityPlayerInterface playerInterface = (TileEntityPlayerInterface)te;
+
+            upgrades = playerInterface.installedUpgrades;
+            Set<String> keySet = upgrades.keySet();
+            Iterator<String> it1 = keySet.iterator();
+
+            while(it1.hasNext())
+            {
+                String name = it1.next();
+
+                ItemUpgrade item = (ItemUpgrade)UpgradeRegistry.getUpgrade(name);
+
+                retStacks.add(new ItemStack(item, upgrades.get(name)));
+            }
+        }
+
+        return retStacks;
+    }
+
+    @Override
+    public boolean canDismantle(EntityPlayer player, World world, int x, int y, int z)
+    {
+        return true;
+    }
 }

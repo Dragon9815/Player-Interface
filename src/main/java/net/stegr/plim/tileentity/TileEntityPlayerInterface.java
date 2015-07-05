@@ -1,10 +1,10 @@
 package net.stegr.plim.tileentity;
 
-import buildcraft.api.core.EnumColor;
-import buildcraft.api.transport.IPipeConnection;
-import buildcraft.api.transport.IPipeTile;
+import com.sun.xml.internal.ws.client.dispatch.PacketDispatch;
+import com.sun.xml.internal.ws.commons.xmlutil.Converter;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,18 +13,11 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import buildcraft.api.transport.IInjectable;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.stegr.plim.item.upgrade.IUpgrade;
-import net.stegr.plim.item.upgrade.ItemUpgradeBuffer;
 import net.stegr.plim.utility.LogHelper;
 import net.stegr.plim.utility.UpgradeRegistry;
-import org.apache.commons.logging.Log;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 public class TileEntityPlayerInterface extends TileEntityUpgradeable implements ISidedInventory
@@ -107,6 +100,9 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 }
             }
         }
+
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        this.markDirty();
     }
 
     private int firstStackInBuffer()
@@ -280,17 +276,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         super.writeToNBT(par1);
 
-        String temp = "";
-
-        if(boundPlayer != null)
-        {
-            temp = boundPlayer.getUniqueID().toString();
-        }
-
-        par1.setString("boundPlayer", temp);
-
-        par1.setBoolean("hasBuffer", hasBuffer);
-        par1.setBoolean("doesTransfer", doesTransfer);
+        this.writeSyncableData(par1);
 
         NBTTagList tag = new NBTTagList();
 
@@ -310,31 +296,9 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public void readFromNBT(NBTTagCompound par1)
     {
-        NBTTagCompound var1 = (NBTTagCompound)par1.copy();
-        super.readFromNBT(var1);
+        super.readFromNBT(par1);
 
-        String id;
-
-        if(par1.hasKey("boundPlayer"))
-        {
-            id = par1.getString("boundPlayer");
-
-            if (!id.equals(""))
-            {
-                uuid = id;
-                bindPlayer = true;
-            }
-            else
-            {
-                boundPlayer = null;
-            }
-        }
-
-        if(par1.hasKey("hasBuffer"))
-            hasBuffer = par1.getBoolean("hasBuffer");
-
-        if(par1.hasKey("doesTransfer"))
-            doesTransfer = par1.getBoolean("doesTransfer");
+        this.readSyncableData(par1);
 
         if(par1.hasKey("Buffer_Slots"))
         {
@@ -347,6 +311,21 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 bufferSlots[i] = ItemStack.loadItemStackFromNBT(tag);
             }
         }
+    }
+
+    public void SyncWriteToNBT(NBTTagCompound tag)
+    {
+        tag.setBoolean("hasBuffer", hasBuffer);
+        tag.setBoolean("doesTransfer", doesTransfer);
+
+        tag.setString("boundPlayer", boundPlayer.getUniqueID().toString());
+    }
+
+    public void SyncReadFromNBT(NBTTagCompound tag)
+    {
+        hasBuffer = tag.getBoolean("hasBuffer");
+        doesTransfer = tag.getBoolean("doesTransfer");
+        uuid = tag.getString("boundPlayer");
     }
 
     @Override
@@ -395,5 +374,48 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     public EntityPlayer getBoundPlayer()
     {
         return this.boundPlayer;
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
+    {
+        if(pkt.func_148853_f() == 64)
+        {
+            this.readSyncableData(pkt.func_148857_g());
+        }
+    }
+
+    public Packet getDescriptionPacket()
+    {
+        NBTTagCompound tag = new NBTTagCompound();
+
+        writeSyncableData(tag);
+
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 64, tag);
+    }
+
+    public final void writeSyncableData(NBTTagCompound tag)
+    {
+        tag.setBoolean("hasBuffer", this.hasBuffer);
+        tag.setBoolean("doesTransfer", this.doesTransfer);
+        tag.setString("boundPlayer", (boundPlayer != null) ? boundPlayer.getUniqueID().toString() : "");
+    }
+
+    public final void readSyncableData(NBTTagCompound tag)
+    {
+        this.hasBuffer = tag.getBoolean("hasBuffer");
+        this.doesTransfer = tag.getBoolean("doesTransfer");
+
+        String uuid = tag.getString("boundPlayer");
+
+        if(!uuid.equals(""))
+        {
+            bindPlayer = true;
+            this.uuid = uuid;
+        }
+        else
+        {
+            this.boundPlayer = null;
+        }
     }
 }
