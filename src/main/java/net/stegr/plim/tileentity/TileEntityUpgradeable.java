@@ -17,7 +17,7 @@ import net.stegr.plim.utility.UpgradeRegistry;
 import javax.swing.text.html.parser.Entity;
 import java.util.*;
 
-public abstract class TileEntityUpgradeable extends TileEntity
+public abstract class TileEntityUpgradeable extends TileEntityBase
 {
     public Map<String, Integer> installedUpgrades;
     public Map<String, Integer> validUpgrades;
@@ -73,7 +73,7 @@ public abstract class TileEntityUpgradeable extends TileEntity
 
         if(installedUpgrades.containsKey(upgrade.getUpgradeID()))
         {
-            LogHelper.info("var1: " + installedUpgrades.get(upgrade.getUpgradeID()));
+            //LogHelper.info("var1: " + installedUpgrades.get(upgrade.getUpgradeID()));
             var1 += installedUpgrades.get(upgrade.getUpgradeID());
         }
 
@@ -147,12 +147,10 @@ public abstract class TileEntityUpgradeable extends TileEntity
             {
                 NBTTagCompound tag1 = tagList.getCompoundTagAt(i);
 
-                LogHelper.info(i);
-
                 if(tag1.hasKey("name") && tag1.hasKey("count"))
                 {
                     installedUpgrades.put(tag1.getString("name"), tag1.getInteger("count"));
-                    LogHelper.info("name: " + tag1.getString("name") + ", count: " + String.valueOf(tag1.getInteger("count")));
+                    //LogHelper.info("name: " + tag1.getString("name") + ", count: " + String.valueOf(tag1.getInteger("count")));
                 }
                 else
                 {
@@ -187,6 +185,53 @@ public abstract class TileEntityUpgradeable extends TileEntity
         }
 
         tag.setTag("Upgrades", tag1);
+    }
+
+    public void writeToSyncNBT(NBTTagCompound tag)
+    {
+        Set<String> keySet = installedUpgrades.keySet();
+        Iterator<String> it1 = keySet.iterator();
+        NBTTagList tag1 = new NBTTagList();
+        int i = 0;
+
+        while(it1.hasNext())
+        {
+            String key = it1.next();
+            int count = installedUpgrades.get(key);
+            NBTTagCompound tag2 = new NBTTagCompound();
+            tag2.setString("name", key);
+            tag2.setInteger("count", count);
+
+            tag1.appendTag(tag2);
+            i++;
+        }
+
+        tag.setTag("Upgrades", tag1);
+    }
+
+    public void readFromSyncNBT(NBTTagCompound tag)
+    {
+        installedUpgrades.clear();
+
+        if(tag.hasKey("Upgrades"))
+        {
+            NBTTagList tagList = tag.getTagList("Upgrades", 10);
+
+            for(int i = 0; i < tagList.tagCount(); i++)
+            {
+                NBTTagCompound tag1 = tagList.getCompoundTagAt(i);
+
+                if(tag1.hasKey("name") && tag1.hasKey("count"))
+                {
+                    installedUpgrades.put(tag1.getString("name"), tag1.getInteger("count"));
+                    //LogHelper.info("name: " + tag1.getString("name") + ", count: " + String.valueOf(tag1.getInteger("count")));
+                }
+                else
+                {
+                    LogHelper.fatal("Something messed up my NBT!");
+                }
+            }
+        }
     }
 
 }

@@ -7,5 +7,7 @@ public interface IUpgrade
 {
     String getUpgradeID();
 
+    String getLocalizedName();
+
     String[] getPrerequisites();
 }

@@ -9,7 +9,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.stegr.plim.integration.waila.BaseWailaDataProvider;
+import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.tileentity.TileEntityPlayerInterface;
+import net.stegr.plim.utility.UpgradeRegistry;
 
 import java.util.Iterator;
 import java.util.List;
@@ -41,8 +43,9 @@ public class PlayerInterfaceWailaDataProvider extends BaseWailaDataProvider
             while(it1.hasNext())
             {
                 final String name = it1.next();
+                final IUpgrade upgrade = UpgradeRegistry.getUpgrade(name);
 
-                currentToolTip.add("- " + name + ": " + String.valueOf(upgrades.get(name)));
+                currentToolTip.add("- " + ((upgrade != null) ? upgrade.getLocalizedName() : name) + ": " + String.valueOf(upgrades.get(name)));
             }
         }
 

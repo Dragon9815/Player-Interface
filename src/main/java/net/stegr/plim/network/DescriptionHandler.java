@@ -24,16 +24,6 @@ public class DescriptionHandler extends SimpleChannelInboundHandler<FMLProxyPack
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket msg) throws Exception
     {
-        ByteBuf buf = msg.payload();
 
-        int x = buf.readInt();
-        int y = buf.readInt();
-        int z = buf.readInt();
-
-        TileEntity te = PlayerInterfaceMod.proxy.getClientPlayer().worldObj.getTileEntity(x, y, z);
-        if(te instanceof TileEntityPlayerInterface)
-        {
-            ((TileEntityPlayerInterface)te).readFromPacket(buf);
-        }
     }
 }

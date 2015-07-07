@@ -52,7 +52,7 @@ public class PlayerInterfaceMod
     public void init(FMLInitializationEvent event)
     {
         // TODO: Fix WAILA implementation
-        /*Waila waila = new Waila();
+        Waila waila = new Waila();
 
         try
         {
@@ -62,6 +62,6 @@ public class PlayerInterfaceMod
         {
             throwable.printStackTrace();
             LogHelper.info("Waila integration not loaded");
-        }*/
+        }
     }
 }

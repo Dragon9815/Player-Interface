@@ -4,6 +4,7 @@ import com.sun.xml.internal.ws.client.dispatch.PacketDispatch;
 import com.sun.xml.internal.ws.commons.xmlutil.Converter;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -16,6 +17,8 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants;
 import net.stegr.plim.item.upgrade.IUpgrade;
 import net.stegr.plim.network.DescriptionHandler;
 import net.stegr.plim.reference.Reference;
@@ -57,29 +60,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     }
 
     @Override
-    public void updateEntity()
+    public void updateEntityServer()
     {
-        if(bindPlayer && !worldObj.isRemote)
-        {
-            Iterator it = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
-            EntityPlayer p;
-
-            while (it.hasNext())
-            {
-                p = (EntityPlayer) it.next();
-
-                if (p.getUniqueID().equals(UUID.fromString(uuid)))
-                {
-                    bindPlayer(p);
-                    LogHelper.info("Successfully rebound player!");
-                    uuid = "";
-                    bindPlayer = false;
-                }
-            }
-
-            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-        }
-
         if(hasBuffer && doesTransfer)
         {
             int var1 = firstStackInBuffer();
@@ -110,7 +92,39 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         }
 
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-        this.markDirty();
+    }
+
+    @Override
+    public void updateEntityClient()
+    {
+
+    }
+
+    @Override
+    public void updateEntity()
+    {
+        super.updateEntity();
+
+        if(bindPlayer)
+        {
+            Iterator it = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
+            EntityPlayer p;
+
+            while (it.hasNext())
+            {
+                p = (EntityPlayer) it.next();
+
+                if (p.getUniqueID().equals(UUID.fromString(uuid)))
+                {
+                    bindPlayer(p);
+                    uuid = "";
+                    bindPlayer = false;
+                    this.markDirty();
+                }
+            }
+
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
     }
 
     private int firstStackInBuffer()
@@ -300,7 +314,9 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             tagList.appendTag(tag1);
         }
 
-        tag.setTag("Buffer_Slots", tag);
+        tag.setTag("Buffer_Slots", tagList);
+
+
     }
 
     @Override
@@ -389,30 +405,46 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        super.onDataPacket(net, pkt);
+        readFromSyncNBT(pkt.func_148857_g());
     }
 
+    @Override
     public Packet getDescriptionPacket()
     {
-        ByteBuf buf = Unpooled.buffer();
+        NBTTagCompound tag = new NBTTagCompound();
 
-        buf.writeInt(xCoord);
-        buf.writeInt(yCoord);
-        buf.writeInt(zCoord);
+        writeToSyncNBT(tag);
 
-        writeToPacket(buf);
-        return new FMLProxyPacket(buf, DescriptionHandler.CHANNEL);
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag);
     }
 
-    protected void writeToPacket(ByteBuf buf)
+    public void writeToSyncNBT(NBTTagCompound tag)
     {
-        ByteBufUtils.writeUTF8String(buf, ((boundPlayer != null) ? boundPlayer.getUniqueID().toString() : ""));
-        buf.writeBoolean(this.hasBuffer);
-        buf.writeBoolean(this.doesTransfer);
+        super.writeToSyncNBT(tag);
+
+        tag.setBoolean("hasBuffer", this.hasBuffer);
+        tag.setBoolean("doesTransfer", this.doesTransfer);
+        tag.setString("boundPlayer", (this.boundPlayer != null) ? this.boundPlayer.getUniqueID().toString() : "");
     }
 
-    public void readFromPacket(ByteBuf buf)
+    public void readFromSyncNBT(NBTTagCompound tag)
     {
+        super.readFromSyncNBT(tag);
+
+        this.hasBuffer = tag.getBoolean("hasBuffer");
+        this.doesTransfer = tag.getBoolean("doesTransfer");
+
+        String boundPlayer = tag.getString("boundPlayer");
+
+        if(!boundPlayer.equals(""))
+        {
+            uuid = boundPlayer;
+            bindPlayer = true;
+        }
+        else
+        {
+            this.boundPlayer = null;
+        }
 
     }
 }
