@@ -1,0 +1,6 @@
+itemGroup.plim=Player Interface Mod
+
+tile.plim:pl_interface.name=Player Interface
+
+item.plim:upgrade_buffer.name=Buffer Upgrade
+item.plim:upgrade_transfer.name=Transfer Upgrade
