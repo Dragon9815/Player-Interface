@@ -1,0 +1,7 @@
+itemGroup.playerinterfacemod=Player-Interface Mod
+
+tile.playerinterfacemod:pl_interface.name=Player Interface
+
+item.playerinterfacemod:upgrade_buffer.name=Buffer Upgrade
+item.playerinterfacemod:upgrade_transfer.name=Transfer Upgrade
+item.playerinterfacemod:upgrade_comperator.name=Comperator Upgrade
