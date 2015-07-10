@@ -1,0 +1,34 @@
+package net.stegr.playerinterfacemod.recipe;
+
+import net.stegr.playerinterfacemod.handler.ConfigurationHandler;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class RecipeRegistry
+{
+    private static Map<ConfigurationHandler.Recipes, RecipeSet> recipes;
+
+    private final static RecipeSet VanillaRecipes = new RecipeSetVanilla();
+    private final static RecipeSet ThermalExpansionRecipes = new RecipeSetThermalExpansion();
+
+    public static void init()
+    {
+        recipes = new HashMap<ConfigurationHandler.Recipes, RecipeSet>();
+
+        addRecipeSet(VanillaRecipes, ConfigurationHandler.Recipes.VANILLA);
+        addRecipeSet(ThermalExpansionRecipes, ConfigurationHandler.Recipes.THERMALEXPANSION);
+    }
+
+    private static void addRecipeSet(RecipeSet set, ConfigurationHandler.Recipes recipeType)
+    {
+        recipes.put(recipeType, set);
+    }
+
+    public static  void loadRecipes(ConfigurationHandler.Recipes recipeType)
+    {
+        RecipeSet set = recipes.get(recipeType);
+
+        set.init();
+    }
+}
