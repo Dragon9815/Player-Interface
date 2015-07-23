@@ -3,10 +3,19 @@ package net.stegr.playerinterfacemod.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentStyle;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
-import net.stegr.playerinterfacemod.item.upgrade.IUpgrade;
+import net.stegr.playerinterfacemod.inventory.InventoryUpgradeable;
 import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
 import net.stegr.playerinterfacemod.tileentity.TileEntityUpgradeable;
+import net.stegr.repackage.cofh.lib.util.helpers.StringHelper;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class BlockPlimTileEntityUpgradeable extends BlockPlimTileEntity implements IBlockUpgradeable
 {
@@ -33,7 +42,7 @@ public abstract class BlockPlimTileEntityUpgradeable extends BlockPlimTileEntity
                 {
                     ItemUpgrade item = (ItemUpgrade) player.getHeldItem().getItem();
 
-                    if (this.doUpgrade(item, te))
+                    if (this.doUpgrade(item, te, player))
                     {
                         player.getHeldItem().stackSize--;
                         return true;
@@ -55,16 +64,50 @@ public abstract class BlockPlimTileEntityUpgradeable extends BlockPlimTileEntity
         super.breakBlock(world, x, y, z, block, meta);
     }
 
-    public boolean doUpgrade(IUpgrade upgrade, TileEntityUpgradeable tileEntity)
+    public boolean doUpgrade(ItemUpgrade upgrade, TileEntityUpgradeable tileEntity, EntityPlayer player)
     {
-        if (tileEntity.installedUpgrades.size() < this.getUpgradeSlots())
+        if (tileEntity.isUpgradeValid(upgrade))
         {
-            if (tileEntity.isUpgradeValid(upgrade))
+            tileEntity.addUpgrade(upgrade, 1);
+            player.addChatMessage(new ChatComponentText(StringHelper.GREEN + String.format(StringHelper.localize("message.upgrade.installed"), upgrade.getLocalizedName())));
+            return true;
+        }
+        else
+        {
+            InventoryUpgradeable.UpgradeFault fault;
+            fault = ((InventoryUpgradeable) tileEntity.getUpgradeInventory()).getLastUpgradeFault();
+
+            player.addChatComponentMessage(new ChatComponentText(StringHelper.RED + String.format(StringHelper.localize("message.upgrade.fault"), upgrade.getLocalizedName())));
+
+            switch (fault)
             {
-                tileEntity.addUpgrade(upgrade);
-                return true;
+            case Unknown:
+                player.addChatComponentMessage(new ChatComponentText(StringHelper.RED + StringHelper.localize("message.upgrade.fault.unknown")));
+                break;
+            case Invalid:
+                player.addChatComponentMessage(new ChatComponentText(StringHelper.RED + StringHelper.localize("message.upgrade.fault.invalid")));
+                break;
+            case AlreadyInstalled:
+                player.addChatComponentMessage(new ChatComponentText(StringHelper.RED + StringHelper.localize("message.upgrade.fault.alreadyInstalled")));
+                break;
+            case MissingReq:
+                player.addChatComponentMessage(new ChatComponentText(StringHelper.RED + StringHelper.localize("message.upgrade.fault.missingReq")));
+
+                List<ItemUpgrade> missig = ((InventoryUpgradeable) tileEntity.getUpgradeInventory()).listMissingUpgrades(upgrade);
+                Iterator<ItemUpgrade> it1 = missig.iterator();
+
+                while(it1.hasNext())
+                {
+                    ItemUpgrade var1 = it1.next();
+
+                    player.addChatComponentMessage(new ChatComponentText(StringHelper.RED + " - " + var1.getLocalizedName()));
+                }
+
+                break;
             }
         }
+
+
 
         return false;
     }

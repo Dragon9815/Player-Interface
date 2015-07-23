@@ -28,10 +28,13 @@ public class RecipeSetThermalExpansion extends RecipeSet
 
     public void init()
     {
-        if(!Loader.isModLoaded(TE) || !Loader.isModLoaded(TD))
+        boolean TELoaded = Loader.isModLoaded(TE);
+        boolean TDLoaded = Loader.isModLoaded(TD);
+
+        if(!TELoaded || !TDLoaded)
         {
             LogHelper.fatal("Thermal Expansion and Thermal Dynamics is required for Thermal Expansion recipes.");
-            throw new MissingModsException(Collections.singleton((ArtifactVersion) new DefaultArtifactVersion(TE)));
+            throw new MissingModsException(Collections.singleton((ArtifactVersion) new DefaultArtifactVersion((!TELoaded) ? TE : TD)));
         }
 
         getItems();

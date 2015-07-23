@@ -47,7 +47,7 @@ public class ConfigurationHandler
 
     private static void loadConfiguration()
     {
-        configuration.addCustomCategoryComment("recipes", "1 .. Vanilla\n2 .. Thermal Expansion (requires Thermal Expansion and Thermal Foundation to be installed!)");
+        configuration.addCustomCategoryComment("recipes", "1 .. Vanilla\n2 .. Thermal Expansion (requires Thermal Expansion and Thermal Dynamics to be installed!)");
         recipesType = Recipes.values()[configuration.get("recipes", "recipeType", ((Loader.isModLoaded("ThermalExpansion") && Loader.isModLoaded("ThermalDynamics")) ? 2 : 1)).getInt() - 1];
 
 

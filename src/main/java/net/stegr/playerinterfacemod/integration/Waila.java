@@ -1,9 +1,9 @@
 package net.stegr.playerinterfacemod.integration;
 
 import cpw.mods.fml.common.event.FMLInterModComms;
-import mcp.mobius.waila.api.IWailaDataProvider;
-import mcp.mobius.waila.api.IWailaRegistrar;
 import net.stegr.playerinterfacemod.integration.waila.TileWailaDataProvider;
+import net.stegr.repackage.mcp.mobius.waila.api.IWailaDataProvider;
+import net.stegr.repackage.mcp.mobius.waila.api.IWailaRegistrar;
 import net.stegr.playerinterfacemod.tileentity.TileEntityUpgradeable;
 
 public class Waila

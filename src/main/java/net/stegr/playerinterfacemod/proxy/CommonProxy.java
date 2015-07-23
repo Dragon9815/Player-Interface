@@ -5,4 +5,8 @@ import net.minecraft.entity.player.EntityPlayer;
 public abstract class CommonProxy implements IProxy
 {
     public abstract EntityPlayer getClientPlayer();
+
+    public void intermodComm(){
+
+    }
 }

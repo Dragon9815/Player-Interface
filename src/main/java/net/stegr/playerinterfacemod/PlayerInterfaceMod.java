@@ -13,8 +13,6 @@ import net.stegr.playerinterfacemod.integration.Waila;
 import net.stegr.playerinterfacemod.network.DescriptionHandler;
 import net.stegr.playerinterfacemod.proxy.CommonProxy;
 import net.stegr.playerinterfacemod.recipe.RecipeRegistry;
-import net.stegr.playerinterfacemod.recipe.RecipeSetThermalExpansion;
-import net.stegr.playerinterfacemod.recipe.RecipeSetVanilla;
 import net.stegr.playerinterfacemod.reference.Reference;
 import net.stegr.playerinterfacemod.utility.LogHelper;
 import net.stegr.playerinterfacemod.utility.UpgradeRegistry;
@@ -48,17 +46,7 @@ public class PlayerInterfaceMod
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        Waila waila = new Waila();
-
-        try
-        {
-            waila.init();
-            LogHelper.info("Waila integration loaded");
-        } catch (Throwable throwable)
-        {
-            throwable.printStackTrace();
-            LogHelper.info("Waila integration not loaded");
-        }
+        proxy.intermodComm();
 
         RecipeRegistry.init();
         RecipeRegistry.loadRecipes(ConfigurationHandler.recipesType);

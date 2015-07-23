@@ -6,10 +6,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.stegr.playerinterfacemod.reference.UpgradeNames;
 import net.stegr.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+import net.stegr.playerinterfacemod.utility.LogHelper;
 
 
 public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable implements IBlockUpgradeable //, IDismantleable
@@ -32,7 +34,7 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     {
         if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9) && !world.isRemote)
         {
-           /* TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
+           TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
             if (!(player instanceof FakePlayer))
             {
@@ -62,7 +64,7 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
                         }
                     }
                 }
-            }*/
+            }
 
         }
         return true;
@@ -77,7 +79,7 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     @Override
     public int getUpgradeSlots()
     {
-        return 10;
+        return 5;
     }
 
 

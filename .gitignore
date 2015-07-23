@@ -63,4 +63,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-src/main/java/cofh/api/world/IFeatureParser.java
+src/main/java/net.stegr.repackage.cofh/api/world/IFeatureParser.java

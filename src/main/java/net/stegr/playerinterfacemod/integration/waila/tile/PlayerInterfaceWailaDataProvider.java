@@ -1,17 +1,18 @@
 package net.stegr.playerinterfacemod.integration.waila.tile;
 
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.entity.player.EntityPlayer;
+import net.stegr.playerinterfacemod.inventory.InventoryUpgradeable;
+import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
+import net.stegr.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+import net.stegr.repackage.cofh.lib.util.helpers.StringHelper;
+import net.stegr.repackage.mcp.mobius.waila.api.IWailaConfigHandler;
+import net.stegr.repackage.mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.stegr.playerinterfacemod.integration.waila.BaseWailaDataProvider;
-import net.stegr.playerinterfacemod.item.upgrade.IUpgrade;
-import net.stegr.playerinterfacemod.tileentity.TileEntityPlayerInterface;
-import net.stegr.playerinterfacemod.utility.UpgradeRegistry;
 
 import java.util.Iterator;
 import java.util.List;
@@ -25,27 +26,25 @@ public class PlayerInterfaceWailaDataProvider extends BaseWailaDataProvider
     {
         final TileEntity te = accessor.getTileEntity();
 
-        if( te instanceof TileEntityPlayerInterface)
+        if(te instanceof TileEntityPlayerInterface)
         {
             final TileEntityPlayerInterface playerInterface = (TileEntityPlayerInterface)te;
             final EntityPlayer boundPlayer = playerInterface.getBoundPlayer();
-            final Map<String, Integer> upgrades = playerInterface.installedUpgrades;
-            final Set<String> upgradeNames = upgrades.keySet();
+            final ItemStack[] upgrades = ((InventoryUpgradeable)playerInterface.getUpgradeInventory()).getInstalledUpgrades();
 
-            currentToolTip.add("Bound Player: " + ((boundPlayer == null) ? "none" : boundPlayer.getDisplayName()));
+            currentToolTip.add(StringHelper.localize("waila.boundPlayer") + " " + ((boundPlayer == null) ? "none" : boundPlayer.getDisplayName()));
 
-            if(upgradeNames.size() > 0)
+            if(upgrades.length > 0)
             {
-                currentToolTip.add("Upgrades: ");
+                currentToolTip.add(StringHelper.localize("waila.upgrades"));
             }
 
-            final Iterator<String> it1 = upgradeNames.iterator();
-            while(it1.hasNext())
+            for(ItemStack upgrade : upgrades)
             {
-                final String name = it1.next();
-                final IUpgrade upgrade = UpgradeRegistry.getUpgrade(name);
-
-                currentToolTip.add("- " + ((upgrade != null) ? upgrade.getLocalizedName() : name) + ": " + String.valueOf(upgrades.get(name)));
+                if(upgrade != null)
+                {
+                    currentToolTip.add("- " + (((ItemUpgrade)upgrade.getItem()).getLocalizedName()) + ": " + String.valueOf(upgrade.stackSize));
+                }
             }
         }
 

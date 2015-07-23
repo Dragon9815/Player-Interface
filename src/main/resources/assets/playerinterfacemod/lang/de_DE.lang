@@ -1,7 +1,33 @@
+# Item groups
 itemGroup.playerinterfacemod=Player-Interface Mod
 
-tile.playerinterfacemod:pl_interface.name=Spieler Interface
+# Block names
+tile.playerinterfacemod:pl_interface.name=Spieler-Interface
 
-item.playerinterfacemod:upgrade_buffer.name=Puffer-Upgrade
-item.playerinterfacemod:upgrade_transfer.name=Transfer-Upgrade
-item.playerinterfacemod:upgrade_comperator.name=Komperator-Upgrade
+# Item names
+item.playerinterfacemod:upgrade_buffer.name=Puffer Upgrade
+item.playerinterfacemod:upgrade_transfer.name=Transfer Modul
+item.playerinterfacemod:upgrade_comperator.name=Komperator Modul
+
+# Item descriptions
+item.playerinterfacemod:upgrade_buffer.description=Dieses Upgrade fügt einen Puffer ;zum Transfer Modul hinzu
+item.playerinterfacemod:upgrade_transfer.description=Dieses Modul erlaubt dir, ;Items direkt in dein ;Inventar zu übertragen.
+item.playerinterfacemod:upgrade_comperator.description=Dieses Modul erlaubt dir, ;die Anzahl der Items im Inventar ;anhand eines Komperators zu messen.
+
+# Strings
+string.requirements=Vorraussetzungen
+string.moreInformation=Drücke <SHIFT> für mehr Information.
+
+# Messages
+message.playerBound=Spieler gebunden.
+message.playerUnound=Spieler entbunden.
+message.upgrade.installed=%s wurde installiert.
+message.upgrade.fault=%s konnte nicht installiert werden:
+message.upgrade.fault.unknown=Unknown error. Please post your log on my github, so I can fix this.
+meesage.upgrade.fault.invalid=Dieses Upgrade/Modul ist nicht gültig für diese Maschine.
+message.upgrade.fault.alreadyInstalled=%s ist bereits installiert.
+message.upgrade.fault.missingReq=Dem Upgrade/Module fehlt das folgende:
+
+# Waila
+waila.boundPlayer=Gebundener Spieler:
+waila.upgrades=Upgrades/Module:

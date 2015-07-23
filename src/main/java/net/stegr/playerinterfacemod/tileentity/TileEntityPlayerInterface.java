@@ -9,8 +9,9 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
-import net.stegr.playerinterfacemod.item.upgrade.IUpgrade;
+import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
 import net.stegr.playerinterfacemod.reference.UpgradeNames;
+import net.stegr.playerinterfacemod.utility.LogHelper;
 import net.stegr.playerinterfacemod.utility.UpgradeRegistry;
 import net.stegr.playerinterfacemod.utility.WrappedInventory;
 
@@ -30,6 +31,12 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
     protected WrappedInventory playerInventoryPrev;
 
+    @Override
+    protected int getUpgradeSlots()
+    {
+        return 5;
+    }
+
     public TileEntityPlayerInterface()
     {
         super();
@@ -42,9 +49,13 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         bufferSlots = new ItemStack[9];
         playerInventoryPrev = new WrappedInventory(40);
 
-        validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.BUFFER).getUpgradeID(), 1);
+        /*validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.BUFFER).getUpgradeID(), 1);
         validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.TRANSFER).getUpgradeID(), 1);
-        validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.COMPERATOR).getUpgradeID(), 1);
+        validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.COMPERATOR).getUpgradeID(), 1);*/
+
+        this.upgradeInventory.addValidUpgrade(UpgradeRegistry.getUpgrade(UpgradeNames.BUFFER), 1);
+        this.upgradeInventory.addValidUpgrade(UpgradeRegistry.getUpgrade(UpgradeNames.TRANSFER), 1);
+        this.upgradeInventory.addValidUpgrade(UpgradeRegistry.getUpgrade(UpgradeNames.COMPERATOR), 1);
     }
 
     @Override
@@ -121,8 +132,20 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
             while (it.hasNext())
             {
                 p = (EntityPlayer) it.next();
+                UUID _uuid;
 
-                if (p.getUniqueID().equals(UUID.fromString(uuid)))
+                try
+                {
+                    _uuid = UUID.fromString(uuid);
+                }
+                catch (IllegalArgumentException e)
+                {
+                    LogHelper.info("There's something wrong with the uuid thingy.");
+                    e.printStackTrace();
+                    return;
+                }
+
+                if (p.getUniqueID().equals(_uuid))
                 {
                     bindPlayer(p);
                     uuid = "";
@@ -282,7 +305,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public boolean isUseableByPlayer(EntityPlayer p_70300_1_)
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -388,7 +411,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     }
 
     @Override
-    public void onUpgrade(IUpgrade upgrade)
+    public void onUpgrade(ItemUpgrade upgrade)
     {
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
         changed = true;

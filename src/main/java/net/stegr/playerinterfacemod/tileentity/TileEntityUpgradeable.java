@@ -1,97 +1,72 @@
 package net.stegr.playerinterfacemod.tileentity;
 
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.world.World;
-import net.stegr.playerinterfacemod.item.upgrade.IUpgrade;
+import net.stegr.playerinterfacemod.inventory.InventoryUpgradeable;
 import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
-import net.stegr.playerinterfacemod.utility.LogHelper;
 import net.stegr.playerinterfacemod.utility.UpgradeRegistry;
 
 import java.util.*;
 
 public abstract class TileEntityUpgradeable extends TileEntityBase
 {
-    public Map<String, Integer> installedUpgrades;
-    public Map<String, Integer> validUpgrades;
+    //public Map<String, Integer> installedUpgrades;
+    //public Map<String, Integer> validUpgrades;
+
+    public InventoryUpgradeable upgradeInventory;
+
+    protected ItemStack[] getItemStackArray(Map<String, Integer> upgrades)
+    {
+        ItemStack[] itemStacks = new ItemStack[upgrades.size()];
+        String[] keySet = (String[])upgrades.keySet().toArray();
+
+        for(int i = 0; i < itemStacks.length; i++)
+        {
+            itemStacks[i] = new ItemStack((ItemUpgrade)UpgradeRegistry.getUpgrade(keySet[i]), upgrades.get(keySet[i]));
+        }
+
+        return itemStacks;
+    }
+
+    protected abstract int getUpgradeSlots();
 
     public TileEntityUpgradeable()
     {
         super();
 
-        installedUpgrades = new HashMap<String, Integer>();
-        validUpgrades = new HashMap<String, Integer>();
+        this.upgradeInventory = new InventoryUpgradeable(this.getUpgradeSlots());
     }
 
-    public boolean isUpgradeValid(IUpgrade upgrade)
+    public IInventory getUpgradeInventory()
     {
-        if(validUpgrades.containsKey(upgrade.getUpgradeID()))
-        {
-            if(validUpgrades.get(upgrade.getUpgradeID()) > 0)
-            {
-                String[] prerequisites = upgrade.getPrerequisites();
-
-                if(prerequisites != null)
-                {
-                    for(String s : prerequisites)
-                    {
-                        if(!installedUpgrades.containsKey(s))
-                        {
-                            return false;
-                        }
-                    }
-                }
-
-                if (installedUpgrades.containsKey(upgrade.getUpgradeID()))
-                {
-                    if (installedUpgrades.get(upgrade.getUpgradeID()) < validUpgrades.get(upgrade.getUpgradeID()))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    return true;
-                }
-
-            }
-        }
-
-        return false;
+        return this.upgradeInventory;
     }
 
-    public void addUpgrade(IUpgrade upgrade)
+    public boolean isUpgradeValid(ItemUpgrade upgrade)
     {
-        int var1 = 1;
+        return this.upgradeInventory.isUpgradeValid(upgrade);
+    }
 
-        if(installedUpgrades.containsKey(upgrade.getUpgradeID()))
-        {
-            //LogHelper.info("var1: " + installedUpgrades.get(upgrade.getUpgradeID()));
-            var1 += installedUpgrades.get(upgrade.getUpgradeID());
-        }
-
-        installedUpgrades.put(upgrade.getUpgradeID(), var1);
+    public void addUpgrade(ItemUpgrade upgrade, int num)
+    {
+        upgradeInventory.addUpgrade(upgrade, num);
 
         onUpgrade(upgrade);
     }
 
-    public abstract void onUpgrade(IUpgrade upgrade);
+    public abstract void onUpgrade(ItemUpgrade upgrade);
 
     public void dropAllUpgrades(World world, int x, int y, int z)
     {
-        Set<String> stringSet = installedUpgrades.keySet();
-        Iterator<String> it1 = stringSet.iterator();
-
-        while (it1.hasNext())
+        for(int i = 0; i < this.upgradeInventory.getSizeInventory(); i++)
         {
-            String id = it1.next();
-            ItemUpgrade upgrade = (ItemUpgrade)UpgradeRegistry.getUpgrade(id);
+            ItemStack itemstack = this.upgradeInventory.getStackInSlot(i);
 
-            if(upgrade != null)
+            if(itemstack != null)
             {
-                ItemStack itemstack = new ItemStack(upgrade, 1);
-
                 float f = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
                 float f1 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
                 float f2 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
@@ -126,9 +101,14 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
         }
     }
 
-    public boolean hasUpgrade(String upgradeName)
+    public boolean hasUpgrade(ItemUpgrade upgrade)
     {
-        return (this.installedUpgrades.containsKey(upgradeName) && this.installedUpgrades.get(upgradeName) > 0);
+        return this.upgradeInventory.hasUpgrade(upgrade);
+    }
+
+    public boolean hasUpgrade(String upgradeID)
+    {
+        return this.upgradeInventory.hasUpgrade(UpgradeRegistry.getUpgrade(upgradeID));
     }
 
     @Override
@@ -136,34 +116,16 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
     {
         super.readFromNBT(tag);
 
-        installedUpgrades.clear();
-
-        if(tag.hasKey("Upgrades"))
-        {
-            NBTTagList tagList = tag.getTagList("Upgrades", 10);
-
-            for(int i = 0; i < tagList.tagCount(); i++)
-            {
-                NBTTagCompound tag1 = tagList.getCompoundTagAt(i);
-
-                if(tag1.hasKey("name") && tag1.hasKey("count"))
-                {
-                    installedUpgrades.put(tag1.getString("name"), tag1.getInteger("count"));
-                    //LogHelper.info("name: " + tag1.getString("name") + ", count: " + String.valueOf(tag1.getInteger("count")));
-                }
-                else
-                {
-                    LogHelper.fatal("Something messed up my NBT!");
-                }
-            }
-        }
+        this.upgradeInventory.readFromNBT(tag);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag)
     {
         super.writeToNBT(tag);
-        Set<String> keySet = installedUpgrades.keySet();
+
+        this.upgradeInventory.writeToNBT(tag);
+        /*Set<String> keySet = installedUpgrades.keySet();
         Iterator<String> it1 = keySet.iterator();
         NBTTagList tag1 = new NBTTagList();
         int i = 0;
@@ -183,12 +145,13 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
             i++;
         }
 
-        tag.setTag("Upgrades", tag1);
+        tag.setTag("Upgrades", tag1);*/
     }
 
     public void writeToSyncNBT(NBTTagCompound tag)
     {
-        Set<String> keySet = installedUpgrades.keySet();
+        this.upgradeInventory.writeToNBT(tag);
+        /*Set<String> keySet = installedUpgrades.keySet();
         Iterator<String> it1 = keySet.iterator();
         NBTTagList tag1 = new NBTTagList();
         int i = 0;
@@ -205,12 +168,13 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
             i++;
         }
 
-        tag.setTag("Upgrades", tag1);
+        tag.setTag("Upgrades", tag1);*/
     }
 
     public void readFromSyncNBT(NBTTagCompound tag)
     {
-        installedUpgrades.clear();
+        this.upgradeInventory.readFromNBT(tag);
+        /*installedUpgrades.clear();
 
         if(tag.hasKey("Upgrades"))
         {
@@ -230,7 +194,9 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
                     LogHelper.fatal("Something messed up my NBT!");
                 }
             }
-        }
+        }*/
     }
+
+
 
 }

@@ -1,6 +1,6 @@
 package net.stegr.playerinterfacemod.utility;
 
-import net.stegr.playerinterfacemod.item.upgrade.IUpgrade;
+import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,15 +8,15 @@ import java.util.List;
 
 public class UpgradeRegistry
 {
-    private static List<IUpgrade> registeredUpgrades;
+    private static List<ItemUpgrade> registeredUpgrades;
 
     public static void init()
     {
-        registeredUpgrades = new LinkedList<IUpgrade>();
+        registeredUpgrades = new LinkedList<ItemUpgrade>();
     }
 
 
-    public static void registerUpgrade(IUpgrade upgrade)
+    public static void registerUpgrade(ItemUpgrade upgrade)
     {
         if(!isRegistered(upgrade.getUpgradeID()))
         {
@@ -33,13 +33,13 @@ public class UpgradeRegistry
         return getUpgrade(upgradeID) != null;
     }
 
-    public static IUpgrade getUpgrade(String upgradeID)
+    public static ItemUpgrade getUpgrade(String upgradeID)
     {
-        Iterator<IUpgrade> it = registeredUpgrades.iterator();
+        Iterator<ItemUpgrade> it = registeredUpgrades.iterator();
 
         while(it.hasNext())
         {
-            IUpgrade upgrade = it.next();
+            ItemUpgrade upgrade = it.next();
 
             if(upgrade.getUpgradeID().equals(upgradeID))
             {
