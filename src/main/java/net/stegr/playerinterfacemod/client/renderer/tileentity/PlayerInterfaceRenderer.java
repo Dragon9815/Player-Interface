@@ -11,6 +11,7 @@ import net.minecraft.util.Facing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.stegr.playerinterfacemod.client.model.ModelPlayerInterface;
+import net.stegr.playerinterfacemod.helpers.BlockHelper;
 import net.stegr.playerinterfacemod.reference.Reference;
 import org.lwjgl.opengl.GL11;
 
@@ -55,7 +56,7 @@ public class PlayerInterfaceRenderer extends TileEntitySpecialRenderer
                 if (block instanceof BlockHopper && BlockHopper.getDirectionFromMetadata(tileEntity.getWorldObj().getBlockMetadata(x1 + direction.offsetX, y1 + direction.offsetY, z1 + direction.offsetZ)) == Facing.oppositeSide[direction.ordinal()])
                     connect = true;
 
-                if(te instanceof IEnergyHandler || te instanceof IItemDuct || te instanceof IPipe)
+                if(te instanceof IEnergyHandler || te instanceof IItemDuct || BlockHelper.isBlockPipe(te))
                     connect = true;
 
                 if(connect)
