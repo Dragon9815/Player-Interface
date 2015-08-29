@@ -1,0 +1,5 @@
+TODO:
+ - GUI für Konfigurations-Tool
+
+FEHLER:
+ -Items werden nicht aus erstem Slot gezogen!

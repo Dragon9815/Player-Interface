@@ -1,6 +1,6 @@
 package net.stegr.repackage.cofh.lib.gui.container;
 
-import net.stegr.repackage.cofh.api.item.IInventoryContainerItem;
+import cofh.api.item.IInventoryContainerItem;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

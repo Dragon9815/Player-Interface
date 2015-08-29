@@ -5,29 +5,37 @@ itemGroup.playerinterfacemod=Player-Interface Mod
 tile.playerinterfacemod:pl_interface.name=Spieler-Interface
 
 # Item names
+item.playerinterfacemod:upgrade_base.name=Blankes Upgrade
 item.playerinterfacemod:upgrade_buffer.name=Puffer Upgrade
-item.playerinterfacemod:upgrade_transfer.name=Transfer Modul
-item.playerinterfacemod:upgrade_comperator.name=Komperator Modul
+item.playerinterfacemod:upgrade_transfer.name=Item-Transfer Upgrade
+item.playerinterfacemod:upgrade_comperator.name=Komperator Upgrade
+item.playerinterfacemod:upgrade_rftransfer.name=RF-Transfer Upgrade
+
+# Block descriptions
+tile.playerinterfacemod:pl_interface.description=Dieser Block ist die Basis dieses Mods.
 
 # Item descriptions
 item.playerinterfacemod:upgrade_buffer.description=Dieses Upgrade fügt einen Puffer ;zum Transfer Modul hinzu
-item.playerinterfacemod:upgrade_transfer.description=Dieses Modul erlaubt dir, ;Items direkt in dein ;Inventar zu übertragen.
-item.playerinterfacemod:upgrade_comperator.description=Dieses Modul erlaubt dir, ;die Anzahl der Items im Inventar ;anhand eines Komperators zu messen.
+item.playerinterfacemod:upgrade_transfer.description=Dieses Upgrade erlaubt dir, Items ;direkt in dein Inventar zu übertragen.
+item.playerinterfacemod:upgrade_comperator.description=Dieses Upgrade erlaubt dir, ;die Anzahl der Items im Inventar ;anhand eines Komperators zu messen.
+item.playerinterfacemod:upgrade_base.description=Dieses Item ist ein Crafting-Element.
+item.playerinterfacemod:upgrade_rftransfer.description=Dieses Item erlaubt dir, Items in ;deinem Inventar aufzuladen.
 
 # Strings
+string.validUpgrades=Mögliche Upgrades
 string.requirements=Vorraussetzungen
 string.moreInformation=Drücke <SHIFT> für mehr Information.
 
 # Messages
-message.playerBound=Spieler gebunden.
-message.playerUnound=Spieler entbunden.
+message.playerBound=Spieler gebunden
+message.playerUnbound=Spieler entbunden
 message.upgrade.installed=%s wurde installiert.
 message.upgrade.fault=%s konnte nicht installiert werden:
 message.upgrade.fault.unknown=Unknown error. Please post your log on my github, so I can fix this.
-meesage.upgrade.fault.invalid=Dieses Upgrade/Modul ist nicht gültig für diese Maschine.
-message.upgrade.fault.alreadyInstalled=%s ist bereits installiert.
-message.upgrade.fault.missingReq=Dem Upgrade/Module fehlt das folgende:
+meesage.upgrade.fault.invalid=Dieses Upgrade ist nicht gültig für diese Maschine.
+message.upgrade.fault.alreadyInstalled=Dieses Upgrade ist bereits installiert.
+message.upgrade.fault.missingReq=Um das Upgrade zu installieren fehlt das folgende:
 
 # Waila
-waila.boundPlayer=Gebundener Spieler:
-waila.upgrades=Upgrades/Module:
+waila.owner=Besitzer:
+waila.upgrades=Upgrades:

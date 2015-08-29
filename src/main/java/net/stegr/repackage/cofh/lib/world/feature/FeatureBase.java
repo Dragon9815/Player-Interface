@@ -1,6 +1,6 @@
 package net.stegr.repackage.cofh.lib.world.feature;
 
-import net.stegr.repackage.cofh.api.world.IFeatureGenerator;
+import cofh.api.world.IFeatureGenerator;
 import net.stegr.repackage.cofh.lib.world.biome.BiomeInfo;
 import net.stegr.repackage.cofh.lib.world.biome.BiomeInfoSet;
 

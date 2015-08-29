@@ -1,6 +1,6 @@
 package net.stegr.repackage.cofh.lib.util.helpers;
 
-import net.stegr.repackage.cofh.api.transport.IItemDuct;
+import cofh.api.transport.IItemDuct;
 
 import java.util.List;
 

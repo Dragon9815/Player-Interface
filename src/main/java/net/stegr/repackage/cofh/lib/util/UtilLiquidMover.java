@@ -1,6 +1,6 @@
 package net.stegr.repackage.cofh.lib.util;
 
-import net.stegr.repackage.cofh.api.fluid.ITankContainerBucketable;
+import cofh.api.fluid.ITankContainerBucketable;
 import net.stegr.repackage.cofh.lib.util.helpers.ItemHelper;
 import net.stegr.repackage.cofh.lib.util.position.BlockPosition;
 

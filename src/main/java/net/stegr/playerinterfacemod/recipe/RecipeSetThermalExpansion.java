@@ -10,20 +10,19 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.stegr.playerinterfacemod.init.ModBlocks;
 import net.stegr.playerinterfacemod.init.ModItems;
-import net.stegr.playerinterfacemod.utility.LogHelper;
+import net.stegr.playerinterfacemod.helpers.LogHelper;
 
 import java.util.Collections;
 
 public class RecipeSetThermalExpansion extends RecipeSet
 {
     private static final String TE = "ThermalExpansion";
-    private static final String TF = "ThermalFoundation";
     private static final String TD = "ThermalDynamics";
 
     private static ItemStack tesseract;
     private static ItemStack warpItemduct;
     private static ItemStack warpItemductOpaque;
-    private static ItemStack cacheResonant;
+    private static ItemStack resonantFluxduct;
 
 
     public void init()
@@ -47,23 +46,25 @@ public class RecipeSetThermalExpansion extends RecipeSet
         tesseract = new ItemStack(GameRegistry.findBlock(TE, "Tesseract"), 1, 0);
         warpItemduct = new ItemStack(GameRegistry.findBlock(TD, "ThermalDynamics_32"), 1, 4);
         warpItemductOpaque = new ItemStack(GameRegistry.findBlock(TD, "ThermalDynamics_32"), 1, 5);
-        cacheResonant = new ItemStack(GameRegistry.findBlock(TE, "Cache"), 1, 4);
+        resonantFluxduct = new ItemStack(GameRegistry.findBlock(TD, "ThermalDynamics_0"), 1, 4);
 
 		/* Items */
-
-        LogHelper.info("Items loaded: " + String.valueOf(tesseract));
     }
 
     public void setRecipes()
     {
-        GameRegistry.addShapedRecipe(new ItemStack(ModBlocks.player_interface), "GDG", "DTD", "GDG", 'G', Blocks.gold_block, 'D', Blocks.diamond_block, 'T', tesseract);
+        GameRegistry.addShapedRecipe(new ItemStack(ModBlocks.player_interface), "BGB", "GDG", "BGB", 'B', ModItems.UpgradeBase, 'G', Items.gold_ingot, 'D', tesseract);
 
-        GameRegistry.addShapedRecipe(new ItemStack(ModItems.BufferUpgrade), "SIS", "GCG", "SIS", 'S', Blocks.obsidian, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'C', cacheResonant);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.UpgradeBase), "SIS", "GDG", "SIS", 'D', Blocks.obsidian, 'S', Blocks.stone, 'I', Items.iron_ingot, 'G', Items.gold_ingot);
 
-        GameRegistry.addShapedRecipe(new ItemStack(ModItems.TransferUpgrade), "SIS", "GHG", "SIS", 'S', Blocks.obsidian, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'H', warpItemduct);
-        GameRegistry.addShapedRecipe(new ItemStack(ModItems.TransferUpgrade), "SIS", "GHG", "SIS", 'S', Blocks.obsidian, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'H', warpItemductOpaque);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ItemTransferUpgrade), "GAI", "ABA", "IAG", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', warpItemduct);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ItemTransferUpgrade), "IAG", "ABA", "GAI", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', warpItemduct);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ItemTransferUpgrade), "GAI", "ABA", "IAG", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', warpItemductOpaque);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ItemTransferUpgrade), "IAG", "ABA", "GAI", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', warpItemductOpaque);
 
-        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ComperatorUpgrade), "SIS", "GCG", "SIS", 'S', Blocks.obsidian, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'C', Items.comparator);
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.RFTransferUpgrade), "IAG", "ABA", "GAI", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', resonantFluxduct);
+
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ComperatorUpgrade), "GAI", "ABA", "IAG", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', Items.comparator);
         LogHelper.info("Recipes loaded");
     }
 }

@@ -1,7 +1,13 @@
 package net.stegr.playerinterfacemod.utility;
 
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ReportedException;
+
+import java.util.concurrent.Callable;
 
 public class WrappedInventory
 {

@@ -1,7 +1,7 @@
 package net.stegr.repackage.cofh.lib.util.helpers;
 
-import net.stegr.repackage.cofh.api.tileentity.ISecurable;
-import net.stegr.repackage.cofh.api.tileentity.ISecurable.AccessMode;
+import cofh.api.tileentity.ISecurable;
+import cofh.api.tileentity.ISecurable.AccessMode;
 import com.google.common.base.Strings;
 import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.FMLCommonHandler;

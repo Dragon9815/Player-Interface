@@ -13,12 +13,12 @@ public class BlockPlim extends Block
     public BlockPlim(Material material)
     {
         super(material);
+        this.setCreativeTab(CreativeTabPlim.PLIM_TAB);
     }
 
     public BlockPlim()
     {
-        super(Material.rock);
-        this.setCreativeTab(CreativeTabPlim.PLIM_TAB);
+        this(Material.rock);
     }
 
     @Override

@@ -2,9 +2,9 @@ package net.stegr.repackage.cofh.lib.util.helpers;
 
 import static net.minecraftforge.oredict.OreDictionary.WILDCARD_VALUE;
 
-import net.stegr.repackage.cofh.api.item.IEmpowerableItem;
-import net.stegr.repackage.cofh.api.item.IInventoryContainerItem;
-import net.stegr.repackage.cofh.api.item.IMultiModeItem;
+import cofh.api.item.IEmpowerableItem;
+import cofh.api.item.IInventoryContainerItem;
+import cofh.api.item.IMultiModeItem;
 import net.stegr.repackage.cofh.lib.util.OreDictionaryProxy;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;

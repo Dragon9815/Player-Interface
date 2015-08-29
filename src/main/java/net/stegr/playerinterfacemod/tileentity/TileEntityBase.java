@@ -8,8 +8,8 @@ import net.minecraft.tileentity.TileEntity;
 
 public abstract class TileEntityBase extends TileEntity
 {
-    public abstract void readFromSyncNBT(NBTTagCompound tag);
-    public abstract void writeToSyncNBT(NBTTagCompound tag);
+    //public abstract void readFromSyncNBT(NBTTagCompound tag);
+    //public abstract void writeToSyncNBT(NBTTagCompound tag);
 
     public abstract void updateEntityServer();
     public abstract void updateEntityClient();
@@ -25,7 +25,7 @@ public abstract class TileEntityBase extends TileEntity
             this.updateEntityClient();
     }
 
-    @Override
+    /*@Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
         readFromSyncNBT(pkt.func_148857_g());
@@ -39,5 +39,5 @@ public abstract class TileEntityBase extends TileEntity
         writeToSyncNBT(tag);
 
         return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag);
-    }
+    }*/
 }

@@ -5,8 +5,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
-import net.stegr.playerinterfacemod.utility.UpgradeRegistry;
+import net.stegr.playerinterfacemod.item.ItemUpgrade;
+import net.stegr.playerinterfacemod.registry.UpgradeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +25,18 @@ public class InventoryUpgradeable implements IInventory
 
     UpgradeFault lastFault;
 
-    public InventoryUpgradeable(int size)
+    public InventoryUpgradeable(int size, ItemStack[] validUpgrades)
     {
         this.upgradeStacks = new ItemStack[size];
         this.validUpgrades = new ItemStack[size];
+
+        int i = 0;
+        for(ItemStack upgrade : validUpgrades)
+        {
+            this.validUpgrades[i] = upgrade;
+            i++;
+        }
+
         this.inventorySize = size;
     }
 
@@ -37,7 +45,34 @@ public class InventoryUpgradeable implements IInventory
         return this.upgradeStacks.clone();
     }
 
-    public void addValidUpgrade(ItemUpgrade upgrade, int num)
+    public int getNumInstalled(ItemUpgrade upgrade)
+    {
+        for(ItemStack stack : this.upgradeStacks)
+        {
+            if(stack != null && stack.getItem().equals(upgrade))
+            {
+                return stack.stackSize;
+            }
+        }
+
+        return 0;
+    }
+
+    public int getNumInstalled(String upgradeName)
+    {
+        ItemUpgrade upgrade = UpgradeRegistry.instance().getUpgrade(upgradeName);
+
+        for(ItemStack stack : this.upgradeStacks)
+        {
+            if(stack != null && stack.getItem().equals(upgrade))
+            {
+                return stack.stackSize;
+            }
+        }
+
+        return 0;
+    }
+    /*public void addValidUpgrade(ItemUpgrade upgrade, int num)
     {
         boolean found = false;
 
@@ -65,7 +100,7 @@ public class InventoryUpgradeable implements IInventory
                 }
             }
         }
-    }
+    }*/
 
     public boolean isUpgradeValid(ItemUpgrade upgrade)
     {
@@ -105,7 +140,7 @@ public class InventoryUpgradeable implements IInventory
         {
             for (String s : Prereq)
             {
-                ItemUpgrade upgrade1 = UpgradeRegistry.getUpgrade(s);
+                ItemUpgrade upgrade1 = UpgradeRegistry.instance().getUpgrade(s);
 
                 foundPrereq = false;
 
@@ -150,7 +185,7 @@ public class InventoryUpgradeable implements IInventory
         {
             for (String s : Prereq)
             {
-                ItemUpgrade upgrade1 = UpgradeRegistry.getUpgrade(s);
+                ItemUpgrade upgrade1 = UpgradeRegistry.instance().getUpgrade(s);
 
                 foundPrereq = false;
 
@@ -386,6 +421,8 @@ public class InventoryUpgradeable implements IInventory
 
                 ItemStack stack = ItemStack.loadItemStackFromNBT(tag1);
 
+                //LogHelper.info("UpgradeName: " + stack.getDisplayName());
+
                 this.upgradeStacks[i] = stack;
             }
         }
@@ -398,10 +435,13 @@ public class InventoryUpgradeable implements IInventory
         for(int i = 0; i < this.inventorySize; i++)
         {
             ItemStack stack = this.upgradeStacks[i];
+
             NBTTagCompound tag2 = new NBTTagCompound();
 
             if(stack != null)
+            {
                 stack.writeToNBT(tag2);
+            }
 
             tagList.appendTag(tag2);
         }

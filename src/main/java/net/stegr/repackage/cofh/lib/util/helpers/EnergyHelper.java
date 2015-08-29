@@ -1,10 +1,10 @@
 package net.stegr.repackage.cofh.lib.util.helpers;
 
-import net.stegr.repackage.cofh.api.energy.IEnergyConnection;
-import net.stegr.repackage.cofh.api.energy.IEnergyContainerItem;
-import net.stegr.repackage.cofh.api.energy.IEnergyHandler;
-import net.stegr.repackage.cofh.api.energy.IEnergyProvider;
-import net.stegr.repackage.cofh.api.energy.IEnergyReceiver;
+import cofh.api.energy.IEnergyConnection;
+import cofh.api.energy.IEnergyContainerItem;
+import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyProvider;
+import cofh.api.energy.IEnergyReceiver;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

@@ -1,5 +1,10 @@
 package net.stegr.playerinterfacemod.tileentity;
 
+import cofh.api.energy.EnergyStorage;
+import cofh.api.energy.IEnergyContainerItem;
+import cofh.api.energy.IEnergyReceiver;
+import net.minecraft.block.BlockRedstoneComparator;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -8,28 +13,51 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.server.MinecraftServer;
-import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityHopper;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.stegr.playerinterfacemod.helpers.LogHelper;
+import net.stegr.playerinterfacemod.helpers.PlayerHelper;
+import net.stegr.playerinterfacemod.item.ItemUpgrade;
+import net.stegr.playerinterfacemod.item.upgrade.UpgradeRFTransfer;
+import net.stegr.playerinterfacemod.reference.MachineNames;
 import net.stegr.playerinterfacemod.reference.UpgradeNames;
-import net.stegr.playerinterfacemod.utility.LogHelper;
-import net.stegr.playerinterfacemod.utility.UpgradeRegistry;
+import net.stegr.playerinterfacemod.registry.InterfaceRegistry;
+import net.stegr.playerinterfacemod.registry.UpgradeRegistry;
 import net.stegr.playerinterfacemod.utility.WrappedInventory;
+import net.stegr.repackage.cofh.lib.util.helpers.EnergyHelper;
 
-import java.util.Iterator;
 import java.util.UUID;
 
-public class TileEntityPlayerInterface extends TileEntityUpgradeable implements ISidedInventory
+public class TileEntityPlayerInterface extends TileEntityUpgradeable implements ISidedInventory, IEnergyReceiver
 {
-    private EntityPlayer boundPlayer;
+    private static final int BUFFER_SLOTS = 9;
+    private static final int TRANSFER_COOLDOWN = 5;
+
+    // -------------------------------------------------------
+    // SERVER only
+    private EntityPlayer owner;
+    private UUID ownerUUID;
+    private boolean isOwnerBound;
 
     public ItemStack[] bufferSlots;
-
-    private Boolean bindPlayer;
-    private String uuid;
 
     private boolean changed;
 
     protected WrappedInventory playerInventoryPrev;
+
+    private EnergyStorage energyStorage;
+
+    private boolean isInit;
+    private int transferCooldown;
+    // -------------------------------------------------------
+
+    // -------------------------------------------------------
+    // SYNC Variables
+    public String playerName;
+    public boolean isPlayerOnline;
+    // -------------------------------------------------------
 
     @Override
     protected int getUpgradeSlots()
@@ -37,51 +65,103 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         return 5;
     }
 
+    @Override
+    protected String getMachineName()
+    {
+        return MachineNames.PLAYER_INTERFACE;
+    }
+
     public TileEntityPlayerInterface()
     {
         super();
 
-        boundPlayer = null;
-
-        bindPlayer = false;
-        uuid = "";
+        owner = null;
+        isOwnerBound = false;
+        ownerUUID = null;
 
         bufferSlots = new ItemStack[9];
         playerInventoryPrev = new WrappedInventory(40);
 
-        /*validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.BUFFER).getUpgradeID(), 1);
-        validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.TRANSFER).getUpgradeID(), 1);
-        validUpgrades.put(UpgradeRegistry.getUpgrade(UpgradeNames.COMPERATOR).getUpgradeID(), 1);*/
+        energyStorage = new EnergyStorage(1000);
 
-        this.upgradeInventory.addValidUpgrade(UpgradeRegistry.getUpgrade(UpgradeNames.BUFFER), 1);
-        this.upgradeInventory.addValidUpgrade(UpgradeRegistry.getUpgrade(UpgradeNames.TRANSFER), 1);
-        this.upgradeInventory.addValidUpgrade(UpgradeRegistry.getUpgrade(UpgradeNames.COMPERATOR), 1);
+        playerName = null;
+        isPlayerOnline = true;
+
+        transferCooldown = TRANSFER_COOLDOWN;
+
+        this.isInit = false;
     }
 
     @Override
     public void updateEntityServer()
     {
-        if(this.hasUpgrade(UpgradeNames.BUFFER) && this.hasUpgrade(UpgradeNames.TRANSFER))
+        //LogHelper.info(">>> Is Online: " + this.isPlayerOnline);
+
+        if (!isInit)
+        {
+            if(isOwnerBound)
+            {
+                InterfaceRegistry.addInterface(new InterfaceRegistry.InterfaceDataContainer(this));
+
+                this.isInit = true;
+            }
+        }
+
+        // Try to bind player until it can
+        if (!isOwnerBound)
+        {
+            tryToBindPlayer(this.ownerUUID);
+        }
+
+        if (owner != null && isPlayerOnline)
+        {
+            if(transferCooldown <= 0)
+            {
+                transferCooldown = TRANSFER_COOLDOWN;
+                this.moveBufferItems();
+            }
+
+            if (!WrappedInventory.fromIInventory(owner.inventory).equals(playerInventoryPrev))
+            {
+                changed = true;
+                playerInventoryPrev = WrappedInventory.fromIInventory(owner.inventory);
+            }
+        }
+
+        if (changed)
+        {
+            this.onChange();
+        }
+
+        transferCooldown--;
+    }
+
+    @Override
+    public void updateEntityClient()
+    {
+        //LogHelper.info(">>> Owner[Client]: " + this.owner);
+    }
+
+    @Override
+    public void updateEntity()
+    {
+        super.updateEntity();
+    }
+
+    private void moveBufferItems()
+    {
+        if (this.hasUpgrade(UpgradeNames.ITEMTRANSFER) && this.hasUpgrade(UpgradeNames.ITEMTRANSFER) && this.isPlayerOnline)
         {
             int var1 = firstStackInBuffer();
             if (var1 != -1)
             {
                 ItemStack stack;
 
-                stack = bufferSlots[var1].copy();
+                stack = bufferSlots[var1];
 
-                if (stack.stackSize > 0)
-                {
-                    stack.stackSize = 1;
+                owner.inventory.addItemStackToInventory(stack);
 
-                    if(boundPlayer != null)
-                    {
-                        if (boundPlayer.inventory.addItemStackToInventory(stack))
-                        {
-                            bufferSlots[var1].stackSize--;
-                        }
-                    }
-                }
+                //LogHelper.info(">>> Stacksize: " + stack.stackSize);
 
                 if (bufferSlots[var1].stackSize <= 0)
                 {
@@ -89,77 +169,67 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 }
             }
         }
+    }
+
+    public void dropAllItemsInBuffer(World world, int x, int y, int z)
+    {
+        for(ItemStack itemstack : this.bufferSlots)
+        {
+            if(itemstack != null)
+            {
+                float f = world.rand.nextFloat() * 0.8F + 0.1F;
+                float f1 = world.rand.nextFloat() * 0.8F + 0.1F;
+                float f2 = world.rand.nextFloat() * 0.8F + 0.1F;
+
+                while(itemstack.stackSize > 0)
+                {
+                    int j = world.rand.nextInt(21) + 10;
+
+                    if(j > itemstack.stackSize)
+                    {
+                        j = itemstack.stackSize;
+                    }
+
+                    itemstack.stackSize -= j;
+                    EntityItem entityItem = new EntityItem(world, (double)((float)x + f), (double)((float)y + f1), (double)((float)z + f2), new ItemStack(itemstack.getItem(), j, itemstack.getItemDamage()));
+
+                    if (itemstack.hasTagCompound())
+                    {
+                        entityItem.getEntityItem().setTagCompound((NBTTagCompound)itemstack.getTagCompound().copy());
+                    }
+
+                    float f3 = 0.05F;
+
+                    entityItem.motionX = (double)((float)world.rand.nextGaussian() * f3);
+                    entityItem.motionY = (double)((float)world.rand.nextGaussian() * f3 + 0.2F);
+                    entityItem.motionZ = (double)((float)world.rand.nextGaussian() * f3);
+
+                    world.spawnEntityInWorld(entityItem);
+                }
+            }
+
+        }
+    }
+
+    private void onChange()
+    {
+        this.energyStorage.setMaxTransfer(this.getUpgradeInventory().getNumInstalled(UpgradeNames.RFTRANSFER) * 250);
+        this.energyStorage.setCapacity(this.getUpgradeInventory().getNumInstalled(UpgradeNames.RFTRANSFER) * 250);
+
+        for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS)
+        {
+            if (worldObj.getBlock(xCoord + direction.offsetX, yCoord + direction.offsetY, zCoord + direction.offsetZ) instanceof BlockRedstoneComparator)
+                worldObj.notifyBlockOfNeighborChange(xCoord + direction.offsetX, yCoord + direction.offsetY, zCoord + direction.offsetZ, worldObj.getBlock(xCoord, yCoord, zCoord));
+        }
 
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 
-        if(changed)
-        {
-            worldObj.notifyBlockOfNeighborChange(xCoord - 1, yCoord, zCoord, worldObj.getBlock(xCoord, yCoord, zCoord));
-            worldObj.notifyBlockOfNeighborChange(xCoord + 1, yCoord, zCoord, worldObj.getBlock(xCoord, yCoord, zCoord));
-            worldObj.notifyBlockOfNeighborChange(xCoord, yCoord - 1, zCoord, worldObj.getBlock(xCoord, yCoord, zCoord));
-            worldObj.notifyBlockOfNeighborChange(xCoord, yCoord + 1, zCoord, worldObj.getBlock(xCoord, yCoord, zCoord));
-            worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord - 1, worldObj.getBlock(xCoord, yCoord, zCoord));
-            worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord + 1, worldObj.getBlock(xCoord, yCoord, zCoord));
-            changed = false;
-        }
-
-        if(boundPlayer != null)
-        {
-            if(!WrappedInventory.fromIInventory(boundPlayer.inventory).equals(playerInventoryPrev))
-            {
-                changed = true;
-                playerInventoryPrev = WrappedInventory.fromIInventory(boundPlayer.inventory);
-            }
-        }
-    }
-
-    @Override
-    public void updateEntityClient()
-    {
-
-    }
-
-    @Override
-    public void updateEntity()
-    {
-        super.updateEntity();
-
-        if(bindPlayer)
-        {
-            Iterator it = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
-            EntityPlayer p;
-
-            while (it.hasNext())
-            {
-                p = (EntityPlayer) it.next();
-                UUID _uuid;
-
-                try
-                {
-                    _uuid = UUID.fromString(uuid);
-                }
-                catch (IllegalArgumentException e)
-                {
-                    LogHelper.info("There's something wrong with the uuid thingy.");
-                    e.printStackTrace();
-                    return;
-                }
-
-                if (p.getUniqueID().equals(_uuid))
-                {
-                    bindPlayer(p);
-                    uuid = "";
-                    bindPlayer = false;
-                    worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-                    changed = true;
-                }
-            }
-        }
+        changed = false;
     }
 
     private int firstStackInBuffer()
     {
-        if(this.hasUpgrade(UpgradeNames.BUFFER))
+        if (this.hasUpgrade(UpgradeNames.ITEMTRANSFER))
         {
             for (int i = 0; i < this.bufferSlots.length; ++i)
             {
@@ -177,15 +247,14 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     public int getSizeInventory()
     {
         int size = 0;
-
-        if(boundPlayer != null && this.hasUpgrade(UpgradeNames.TRANSFER))
-        {
-            size += boundPlayer.inventory.getSizeInventory();
-        }
-
-        if(this.hasUpgrade(UpgradeNames.BUFFER))
+        if(this.hasUpgrade(UpgradeNames.ITEMTRANSFER))
         {
             size += this.bufferSlots.length;
+        }
+
+        if (owner != null)
+        {
+            size += owner.inventory.getSizeInventory();
         }
 
         return size;
@@ -196,38 +265,37 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         ItemStack var1 = null;
 
-        if(slot < 0)
-        {
-            throw new IllegalArgumentException("Slot number can't be negative!");
-        }
+        if (!this.hasUpgrade(UpgradeNames.ITEMTRANSFER))
+            return null;
 
-        if(slot < this.bufferSlots.length && this.hasUpgrade(UpgradeNames.BUFFER))
+        if (slot < this.bufferSlots.length)
         {
             var1 = bufferSlots[slot];
         }
-        else
+        else if (this.hasOwner())
         {
-            if (boundPlayer != null && this.hasUpgrade(UpgradeNames.TRANSFER))
-            {
-                var1 = boundPlayer.inventory.getStackInSlot(slot - ((this.hasUpgrade(UpgradeNames.BUFFER)) ? this.bufferSlots.length : 0));
-            }
+            var1 = owner.inventory.getStackInSlot(slot - ((this.hasUpgrade(UpgradeNames.ITEMTRANSFER)) ? this.bufferSlots.length : 0));
         }
 
         return var1;
     }
 
     @Override
-    public ItemStack decrStackSize(int slot, int par2)
+    public ItemStack decrStackSize(int slot, int num)
     {
-        ItemStack[] itemStacks = this.bufferSlots;
+        if (!this.hasUpgrade(UpgradeNames.ITEMTRANSFER))
+            return null;
 
-        if(slot < this.bufferSlots.length && this.hasUpgrade(UpgradeNames.BUFFER))
+        //ItemStack[] itemStacks = this.bufferSlots;
+
+        if (slot < BUFFER_SLOTS)
         {
-            if(itemStacks[slot] != null)
+            return null;
+            /*if (itemStacks[slot] != null)
             {
                 ItemStack stack;
 
-                if(itemStacks[slot].stackSize <= par2)
+                if (itemStacks[slot].stackSize <= num)
                 {
                     stack = itemStacks[slot];
                     itemStacks[slot] = null;
@@ -235,23 +303,21 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 }
                 else
                 {
-                    stack = itemStacks[slot].splitStack(par2);
+                    stack = itemStacks[slot].splitStack(num);
 
-                    if(itemStacks[slot].stackSize == 0)
+                    if (itemStacks[slot].stackSize == 0)
                     {
                         itemStacks[slot] = null;
                     }
 
                     return stack;
                 }
-            }
+            }*/
         }
-        else
+
+        if (this.hasOwner())
         {
-            if (boundPlayer != null && this.hasUpgrade(UpgradeNames.TRANSFER))
-            {
-                return boundPlayer.inventory.decrStackSize(slot - ((this.hasUpgrade(UpgradeNames.BUFFER)) ? this.bufferSlots.length : 0), par2);
-            }
+            return owner.inventory.decrStackSize(slot - ((this.hasUpgrade(UpgradeNames.ITEMTRANSFER)) ? this.bufferSlots.length : 0), num);
         }
 
         changed = true;
@@ -269,17 +335,18 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         ItemStack[] itemStacks = this.bufferSlots;
 
-        if(slot < this.bufferSlots.length && this.hasUpgrade(UpgradeNames.BUFFER))
+        if(slot < BUFFER_SLOTS && this.hasUpgrade(UpgradeNames.ITEMTRANSFER))
         {
             itemStacks[slot] = itemStack;
         }
-        else
+
+        /*else
         {
-            if (boundPlayer != null && this.hasUpgrade(UpgradeNames.TRANSFER))
+            if (owner != null && this.hasUpgrade(UpgradeNames.ITEMTRANSFER))
             {
-                boundPlayer.inventory.setInventorySlotContents(slot - ((this.hasUpgrade(UpgradeNames.BUFFER)) ? this.bufferSlots.length : 0), itemStack);
+                owner.inventory.setInventorySlotContents(slot - ((this.hasUpgrade(UpgradeNames.ITEMTRANSFER)) ? this.bufferSlots.length : 0), itemStack);
             }
-        }
+        }*/
 
         changed = true;
     }
@@ -287,13 +354,13 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public String getInventoryName()
     {
-        return "";
+        return "PlayerInterface";
     }
 
     @Override
     public boolean hasCustomInventoryName()
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -305,7 +372,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     @Override
     public boolean isUseableByPlayer(EntityPlayer p_70300_1_)
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -321,9 +388,12 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     }
 
     @Override
-    public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_)
+    public boolean isItemValidForSlot(int slot, ItemStack itemStack)
     {
-        return this.hasUpgrade(UpgradeNames.TRANSFER);
+        if(!this.hasUpgrade(UpgradeNames.ITEMTRANSFER))
+            return false;
+
+        return slot < BUFFER_SLOTS;
     }
 
     @Override
@@ -331,23 +401,28 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         super.writeToNBT(tag);
 
-        tag.setString("boundPlayer", (boundPlayer != null) ? boundPlayer.getUniqueID().toString() : "");
+        //LogHelper.info(">>> Save UUID: " + ((owner != null) ? owner.getUniqueID().toString() : ""));
+
+        tag.setString("owner", (this.ownerUUID != null) ? this.ownerUUID.toString() : "");
+
+        if(playerName != null && playerName.length() > 0)
+        {
+            tag.setString("playerName", this.playerName);
+        }
 
         NBTTagList tagList = new NBTTagList();
 
-        for(int i = 0; i < bufferSlots.length; i++)
+        for (int i = 0; i < bufferSlots.length; i++)
         {
             NBTTagCompound tag1 = new NBTTagCompound();
 
-            if(bufferSlots[i] != null)
+            if (bufferSlots[i] != null)
                 bufferSlots[i].writeToNBT(tag1);
 
             tagList.appendTag(tag1);
         }
 
         tag.setTag("Buffer_Slots", tagList);
-
-        //this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
     @Override
@@ -355,23 +430,22 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         super.readFromNBT(tag);
 
-        String uuid = tag.getString("boundPlayer");
+        String uuid = tag.getString("owner");
+        //LogHelper.info(">>> Read UUID: " + uuid);
 
         if(!uuid.equals(""))
-        {
-            bindPlayer = true;
-            this.uuid = uuid;
-        }
+            this.bindPlayer(UUID.fromString(uuid));
         else
-        {
-            this.boundPlayer = null;
-        }
+            this.owner = null;
 
-        if(tag.hasKey("Buffer_Slots"))
+        String name = tag.getString("playerName");
+        this.playerName = (name.equals("")) ? null : name;
+
+        if (tag.hasKey("Buffer_Slots"))
         {
             NBTTagList tagList = tag.getTagList("Buffer_Slots", 10);
 
-            for(int i = 0; i < tagList.tagCount() && i < bufferSlots.length; i++)
+            for (int i = 0; i < tagList.tagCount() && i < bufferSlots.length; i++)
             {
                 NBTTagCompound tag1 = tagList.getCompoundTagAt(i);
 
@@ -381,58 +455,156 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int p_94128_1_)
+    // TODO: Add Code for Configuration-Tool
+    public int[] getAccessibleSlotsFromSide(int side)
     {
-        if(boundPlayer != null)
+        int numSlots = 0;
+        int startSlot = 0;
+
+        if(side == ForgeDirection.DOWN.ordinal())
         {
-            int[] temp = new int[boundPlayer.inventory.getSizeInventory()];
-
-            for(int i = 0; i < boundPlayer.inventory.getSizeInventory(); i++)
-            {
-                temp[i] = i;
-            }
-
-            return temp;
+            numSlots = (owner == null) ? 0 : owner.inventory.getSizeInventory();
+            startSlot = BUFFER_SLOTS;
+        }
+        else
+        {
+            numSlots = BUFFER_SLOTS;
+            startSlot = 0;
         }
 
-        return new int[0];
+        int[] slots = new int[numSlots];
+
+        for (int i = 0; i < numSlots; i++)
+        {
+            slots[i] = i + startSlot;
+        }
+
+        return slots;
     }
 
     @Override
-    public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_, int p_102007_3_)
+    public boolean canInsertItem(int slot, ItemStack item, int side)
     {
-        return this.hasUpgrade(UpgradeNames.TRANSFER);
+        return this.hasUpgrade(UpgradeNames.ITEMTRANSFER) && slot < BUFFER_SLOTS && side != ForgeDirection.DOWN.ordinal();
     }
 
     @Override
-    public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_, int p_102008_3_)
+    public boolean canExtractItem(int slot, ItemStack item, int side)
     {
-        return true;
+        return this.owner != null && this.hasUpgrade(UpgradeNames.ITEMTRANSFER) && slot > BUFFER_SLOTS && side == ForgeDirection.DOWN.ordinal();
     }
 
     @Override
     public void onUpgrade(ItemUpgrade upgrade)
     {
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        if (upgrade instanceof UpgradeRFTransfer)
+        {
+            this.energyStorage.setMaxTransfer(this.energyStorage.getMaxExtract() + 250);
+            this.energyStorage.setCapacity(this.energyStorage.getMaxEnergyStored() + 250);
+        }
+
         changed = true;
     }
 
-    public void bindPlayer(EntityPlayer player)
+    public void bindPlayer(UUID playerUUID)
     {
-        boundPlayer = player;
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-        changed = true;
+        this.changed = true;
+
+        if (playerUUID == null)
+        {
+            this.owner = null;
+            return;
+        }
+
+        this.ownerUUID = playerUUID;
+        this.isOwnerBound = false;
     }
 
-    public EntityPlayer getBoundPlayer()
+    public void bindPlayer(String playerUUIDString)
     {
-        return this.boundPlayer;
+        this.changed = true;
+
+        if (playerUUIDString != null)
+        {
+            try
+            {
+                UUID uuid = UUID.fromString(playerUUIDString);
+                this.tryToBindPlayer(uuid);
+                return;
+            }
+            catch (IllegalArgumentException ex)
+            {
+                LogHelper.info(">>> My UUID thingy broke: ");
+                ex.printStackTrace();
+            }
+        }
+
+        this.owner = null;
+    }
+
+    private void tryToBindPlayer(UUID playerUUID)
+    {
+        if (playerUUID == null)
+            return;
+
+        this.owner = PlayerHelper.getPlayer(playerUUID);
+
+        this.isOwnerBound = (this.owner != null);
+
+        if(isOwnerBound) {
+            this.setPlayerOnline();
+            this.playerName = this.owner.getDisplayName();
+        }
+    }
+
+    public void setPlayerOnline()
+    {
+        isPlayerOnline = true;
+        this.changed = true;
+    }
+
+    public void setPlayerOffline()
+    {
+        isPlayerOnline = false;
+        this.owner = null;
+        this.changed = true;
+    }
+
+    public EntityPlayer getOwner()
+    {
+        return this.owner;
+    }
+
+    public boolean hasOwner()
+    {
+        return this.owner != null;
+    }
+
+    public void writeToSyncNBT(NBTTagCompound tag)
+    {
+        super.writeToSyncNBT(tag);
+
+        if(playerName != null && playerName.length() > 0)
+        {
+            tag.setString("playerName", this.playerName);
+        }
+        tag.setBoolean("isPlayerOnline", this.isPlayerOnline);
+    }
+
+    public void readFromSyncNBT(NBTTagCompound tag)
+    {
+        super.readFromSyncNBT(tag);
+
+        String name = tag.getString("playerName");
+
+        this.playerName = (name.equals("")) ? null : name;
+        this.isPlayerOnline = tag.getBoolean("isPlayerOnline");
     }
 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        readFromSyncNBT(pkt.func_148857_g());
+        this.readFromSyncNBT(pkt.func_148857_g());
     }
 
     @Override
@@ -440,32 +612,92 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     {
         NBTTagCompound tag = new NBTTagCompound();
 
-        writeToSyncNBT(tag);
+        this.writeToSyncNBT(tag);
 
         return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag);
     }
 
-    public void writeToSyncNBT(NBTTagCompound tag)
+    @Override
+    public boolean canConnectEnergy(ForgeDirection from)
     {
-        super.writeToSyncNBT(tag);
-
-        tag.setString("boundPlayer", (this.boundPlayer != null) ? this.boundPlayer.getUniqueID().toString() : "");
+        return this.getUpgradeInventory().hasUpgrade(UpgradeRegistry.instance().getUpgrade(UpgradeNames.RFTRANSFER));
     }
 
-    public void readFromSyncNBT(NBTTagCompound tag)
+    @Override
+    public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate)
     {
-        super.readFromSyncNBT(tag);
+        int energyLeft = maxReceive;
+        int received = 0;
 
-        String boundPlayer = tag.getString("boundPlayer");
+        if(this.getUpgradeInventory().hasUpgrade(UpgradeRegistry.instance().getUpgrade(UpgradeNames.RFTRANSFER)))
+        {
+            //received = this.energyStorage.receiveEnergy(energyLeft, simulate);
+            energyLeft = chargePlayerItems(energyLeft, simulate);
+        }
 
-        if(!boundPlayer.equals(""))
+        return maxReceive - energyLeft;
+
+        //return 0;
+    }
+
+    @Override
+    public int getEnergyStored(ForgeDirection from)
+    {
+        //return this.energyStorage.getEnergyStored();
+        return 1;
+    }
+
+    @Override
+    public int getMaxEnergyStored(ForgeDirection from)
+    {
+        //return this.energyStorage.getMaxEnergyStored();
+        return 1;
+    }
+
+    private int chargePlayerItems(int maxEnergy, boolean simulate)
+    {
+        int energyLeft = maxEnergy;
+
+        if(owner != null)
         {
-            uuid = boundPlayer;
-            bindPlayer = true;
+            for (ItemStack itemStack : owner.inventory.mainInventory)
+            {
+                if(EnergyHelper.isEnergyContainerItem(itemStack))
+                {
+                    int transfered = ((IEnergyContainerItem)itemStack.getItem()).receiveEnergy(itemStack, energyLeft, simulate);
+
+                    //LogHelper.info(">>> Transferred " + transfered + "RF to " + itemStack.getDisplayName() + "; simulated: " + simulate);
+
+                    energyLeft -= transfered;
+
+                    if(energyLeft <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if(energyLeft <= 0)
+                return 0;
+
+            for(ItemStack itemStack : owner.inventory.armorInventory)
+            {
+                if(EnergyHelper.isEnergyContainerItem(itemStack))
+                {
+                    int transfered = ((IEnergyContainerItem)itemStack.getItem()).receiveEnergy(itemStack, energyLeft, simulate);
+
+                    //LogHelper.info(">>> Transferred " + transfered + "RF to " + itemStack.getDisplayName() + "; simulated: " + simulate);
+
+                    energyLeft -= transfered;
+
+                    if(energyLeft <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
         }
-        else
-        {
-            this.boundPlayer = null;
-        }
+
+        return Math.max(energyLeft, 0);
     }
 }

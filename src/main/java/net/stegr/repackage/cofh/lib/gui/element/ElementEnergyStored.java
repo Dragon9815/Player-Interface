@@ -1,6 +1,6 @@
 package net.stegr.repackage.cofh.lib.gui.element;
 
-import net.stegr.repackage.cofh.api.energy.IEnergyStorage;
+import cofh.api.energy.IEnergyStorage;
 import net.stegr.repackage.cofh.lib.gui.GuiBase;
 import net.stegr.repackage.cofh.lib.gui.GuiProps;
 import net.stegr.repackage.cofh.lib.render.RenderHelper;

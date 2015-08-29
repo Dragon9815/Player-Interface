@@ -1,26 +1,34 @@
 package net.stegr.playerinterfacemod.block;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.stegr.playerinterfacemod.reference.MachineNames;
 import net.stegr.playerinterfacemod.reference.UpgradeNames;
 import net.stegr.playerinterfacemod.tileentity.TileEntityPlayerInterface;
-import net.stegr.playerinterfacemod.utility.LogHelper;
+import net.stegr.playerinterfacemod.tileentity.TileEntityUpgradeable;
+import net.stegr.playerinterfacemod.utility.Platform;
+
+import java.util.Random;
 
 
-public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable implements IBlockUpgradeable //, IDismantleable
+public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements IBlockUpgradeable //, IDismantleable
 {
     public BlockPlayerInterface()
     {
         super(Material.iron);
-        this.setBlockName("pl_interface");
-        this.setBlockTextureName("pl_interface");
+        this.setBlockName(MachineNames.PLAYER_INTERFACE);
+        this.setBlockTextureName("");
 
         //this.setHarvestLevel("iron", 2);
 
@@ -32,7 +40,7 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9)
     {
-        if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9) && !world.isRemote)
+        /*if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9) && !world.isRemote)
         {
            TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
@@ -40,26 +48,26 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
             {
                 if (player.isSneaking())
                 {
-                    if (te.getBoundPlayer() != null && te.getBoundPlayer().getUniqueID().equals(player.getUniqueID()))
+                    if (te.getOwner() != null && te.getOwner().getUniqueID().equals(player.getUniqueID()))
                     {
-                        te.bindPlayer(null);
+                        te.bindPlayer((EntityPlayer)null);
                         te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
                         if(!world.isRemote)
                         {
-                            player.addChatMessage(new ChatComponentText("Player unbound"));
+                            player.addChatMessage(new ChatComponentText(StringHelper.LIGHT_BLUE + ("" + StringHelper.localize("message.playerUnbound"))));
                             LogHelper.info("Player unbound");
                         }
                     }
                 }
                 else
                 {
-                    if (te.getBoundPlayer() == null)
+                    if (te.getOwner() == null)
                     {
                         te.bindPlayer(player);
                         te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
                         if(!world.isRemote)
                         {
-                            player.addChatMessage(new ChatComponentText("Player bound"));
+                            player.addChatMessage(new ChatComponentText(StringHelper.LIGHT_BLUE + ("" + StringHelper.localize("message.playerBound") + ": " + player.getDisplayName())));
                             LogHelper.info("Player bound: " + player.getUniqueID().toString());
                         }
                     }
@@ -67,7 +75,10 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
             }
 
         }
-        return true;
+
+        return true;*/
+
+        return super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9);
     }
 
     @Override
@@ -87,28 +98,23 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     public ArrayList<ItemStack> dismantleBlock(EntityPlayer player, World world, int x, int y, int z, boolean returnDrops)
     {
         ArrayList<ItemStack> retStacks = new ArrayList<ItemStack>();
-        Map<String, Integer> upgrades;
+        ItemStack[] upgrades;
         TileEntity te = world.getTileEntity(x, y, z);
 
         if(te instanceof  TileEntityPlayerInterface)
         {
             TileEntityPlayerInterface playerInterface = (TileEntityPlayerInterface)te;
 
-            upgrades = playerInterface.installedUpgrades;
-            Set<String> keySet = upgrades.keySet();
-            Iterator<String> it1 = keySet.iterator();
+            upgrades = playerInterface.getUpgradeInventory().getInstalledUpgrades();
 
-            while(it1.hasNext())
+            for(ItemStack upgrade : upgrades)
             {
-                String name = it1.next();
-
-                ItemUpgrade item = (ItemUpgrade)UpgradeRegistry.getUpgrade(name);
-
-                retStacks.add(new ItemStack(item, upgrades.get(name)));
+                retStacks.add(upgrade);
             }
         }
 
         return retStacks;
+        return new ArrayList<ItemStack>();
     }
 
     @Override
@@ -128,9 +134,9 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     {
         TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
 
-        if(te != null && te.getBoundPlayer() != null && te.hasUpgrade(UpgradeNames.COMPERATOR) && !world.isRemote)
+        if(te != null && te.getOwner() != null && te.hasUpgrade(UpgradeNames.COMPERATOR) && !world.isRemote)
         {
-            return Container.calcRedstoneFromInventory(te.getBoundPlayer().inventory);
+            return Container.calcRedstoneFromInventory(te.getOwner().inventory);
         }
 
         return 0;
@@ -139,6 +145,9 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack)
     {
+        if(Platform.isClient())
+            return;
+
         if(entity instanceof EntityPlayer && !(entity instanceof FakePlayer))
         {
             EntityPlayer player = (EntityPlayer)entity;
@@ -146,8 +155,67 @@ public class BlockPlayerInterface extends BlockPlimTileEntityUpgradeable impleme
             {
                 TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
-                te.bindPlayer(player);
+                te.bindPlayer(player.getUniqueID());
+                te.setPlayerOnline();
             }
         }
+    }
+
+    @Override
+    public void breakBlock(World world, int x, int y, int z, Block block, int meta)
+    {
+        TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
+
+        te.dropAllItemsInBuffer(world, x, y, z);
+
+        super.breakBlock(world, x, y, z, block, meta);
+    }
+
+    public int getRenderType()
+    {
+        return -1;
+    }
+
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
+
+    public int getLightOpacity()
+    {
+        return 0;
+    }
+
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side)
+    {
+        return (side == ForgeDirection.UP || side == ForgeDirection.DOWN);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(World world, int x, int y, int z, Random random)
+    {
+        /*TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
+
+        if(te != null && te.transfered && te.getBoundPlayer() != null)
+        {
+            double motionX = te.getBoundPlayer().serverPosX - x;
+            double motionY = te.getBoundPlayer().serverPosY - y;
+            double motionZ = te.getBoundPlayer().serverPosZ - z;
+            Vector3d vec = new Vector3d(0.0F, 1F, 0.0F);
+
+            world.spawnParticle("portal", te.getBoundPlayer().serverPosX, te.getBoundPlayer().serverPosY, te.getBoundPlayer().serverPosZ, motionX, motionY, motionZ);
+            world.spawnParticle("portal", x + 0.5F, y + 1.1F + 0.5F * random.nextFloat(), z + 0.5F, vec.x, vec.y, vec.z);
+            world.spawnParticle("portal", x + 0.5F, y + 1.1F + 0.5F * random.nextFloat(), z + 0.5F, vec.x, vec.y, vec.z);
+            world.spawnParticle("portal", x + 0.5F, y + 1.1F + 0.5F * random.nextFloat(), z + 0.5F, vec.x, vec.y, vec.z);
+
+            //LogHelper.info("spawn");
+
+            //te.transfered = false;
+        }*/
     }
 }

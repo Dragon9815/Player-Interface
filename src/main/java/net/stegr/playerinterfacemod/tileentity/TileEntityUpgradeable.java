@@ -1,13 +1,15 @@
 package net.stegr.playerinterfacemod.tileentity;
 
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.world.World;
 import net.stegr.playerinterfacemod.inventory.InventoryUpgradeable;
-import net.stegr.playerinterfacemod.item.upgrade.ItemUpgrade;
-import net.stegr.playerinterfacemod.utility.UpgradeRegistry;
+import net.stegr.playerinterfacemod.item.ItemUpgrade;
+import net.stegr.playerinterfacemod.registry.UpgradeRegistry;
 
 import java.util.*;
 
@@ -25,22 +27,29 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
 
         for(int i = 0; i < itemStacks.length; i++)
         {
-            itemStacks[i] = new ItemStack((ItemUpgrade)UpgradeRegistry.getUpgrade(keySet[i]), upgrades.get(keySet[i]));
+            itemStacks[i] = new ItemStack((ItemUpgrade)UpgradeRegistry.instance().getUpgrade(keySet[i]), upgrades.get(keySet[i]));
         }
 
         return itemStacks;
     }
 
     protected abstract int getUpgradeSlots();
+    protected abstract String getMachineName();
 
     public TileEntityUpgradeable()
     {
         super();
 
-        this.upgradeInventory = new InventoryUpgradeable(this.getUpgradeSlots());
+        this.upgradeInventory = new InventoryUpgradeable(this.getUpgradeSlots(), UpgradeRegistry.instance().getValidUpgradesForMachine(this.getMachineName()));
     }
 
-    public IInventory getUpgradeInventory()
+    @Override
+    public void updateEntity()
+    {
+        super.updateEntity();
+    }
+
+    public InventoryUpgradeable getUpgradeInventory()
     {
         return this.upgradeInventory;
     }
@@ -108,7 +117,7 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
 
     public boolean hasUpgrade(String upgradeID)
     {
-        return this.upgradeInventory.hasUpgrade(UpgradeRegistry.getUpgrade(upgradeID));
+        return this.upgradeInventory.hasUpgrade(UpgradeRegistry.instance().getUpgrade(upgradeID));
     }
 
     @Override
@@ -125,27 +134,6 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
         super.writeToNBT(tag);
 
         this.upgradeInventory.writeToNBT(tag);
-        /*Set<String> keySet = installedUpgrades.keySet();
-        Iterator<String> it1 = keySet.iterator();
-        NBTTagList tag1 = new NBTTagList();
-        int i = 0;
-
-        while(it1.hasNext())
-        {
-            String key = it1.next();
-            int count = installedUpgrades.get(key);
-            NBTTagCompound tag2 = new NBTTagCompound();
-
-            //tag2.appendTag(new NBTTagString(key));
-            //tag2.appendTag(new NBTTagInt(count));
-            tag2.setString("name", key);
-            tag2.setInteger("count", count);
-
-            tag1.appendTag(tag2);
-            i++;
-        }
-
-        tag.setTag("Upgrades", tag1);*/
     }
 
     public void writeToSyncNBT(NBTTagCompound tag)
@@ -193,10 +181,23 @@ public abstract class TileEntityUpgradeable extends TileEntityBase
                 {
                     LogHelper.fatal("Something messed up my NBT!");
                 }
-            }
+           }
         }*/
     }
 
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
+    {
+        readFromSyncNBT(pkt.func_148857_g());
+    }
 
+    @Override
+    public Packet getDescriptionPacket()
+    {
+        NBTTagCompound tag = new NBTTagCompound();
 
+        writeToSyncNBT(tag);
+
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag);
+    }
 }

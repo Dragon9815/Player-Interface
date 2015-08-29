@@ -1,9 +1,15 @@
 package net.stegr.playerinterfacemod.proxy;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.stegr.playerinterfacemod.integration.Waila;
-import net.stegr.playerinterfacemod.utility.LogHelper;
+import net.minecraft.item.Item;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.stegr.playerinterfacemod.client.renderer.item.ItemPlayerInterfaceRenderer;
+import net.stegr.playerinterfacemod.client.renderer.tileentity.PlayerInterfaceRenderer;
+import net.stegr.playerinterfacemod.init.ModBlocks;
+import net.stegr.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 
 public class ClientProxy extends CommonProxy
 {
@@ -13,18 +19,13 @@ public class ClientProxy extends CommonProxy
         return Minecraft.getMinecraft().thePlayer;
     }
 
-    @Override
-    public void intermodComm(){
-        Waila waila = new Waila();
+    public void registerRenderers() {
+        TileEntitySpecialRenderer renderer = new PlayerInterfaceRenderer();
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPlayerInterface.class, renderer);
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModBlocks.player_interface), new ItemPlayerInterfaceRenderer(renderer, new TileEntityPlayerInterface()));
+    }
 
-        try
-        {
-            waila.init();
-            LogHelper.info("Waila integration loaded");
-        } catch (Throwable throwable)
-        {
-            throwable.printStackTrace();
-            LogHelper.info("Waila integration not loaded");
-        }
+    public void registerTilEntitySpecialRenderers() {
+
     }
 }

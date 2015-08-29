@@ -1,6 +1,6 @@
 package net.stegr.repackage.cofh.lib.util.helpers;
 
-import net.stegr.repackage.cofh.api.item.IAugmentItem;
+import cofh.api.item.IAugmentItem;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

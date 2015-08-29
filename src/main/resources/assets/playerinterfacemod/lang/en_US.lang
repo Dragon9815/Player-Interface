@@ -5,29 +5,35 @@ itemGroup.playerinterfacemod=Player-Interface Mod
 tile.playerinterfacemod:pl_interface.name=Player Interface
 
 # Item names
-item.playerinterfacemod:upgrade_buffer.name=Buffer Upgrade
-item.playerinterfacemod:upgrade_transfer.name=Transfer Module
-item.playerinterfacemod:upgrade_comperator.name=Comperator Module
+item.playerinterfacemod:upgrade_base.name=Blank Upgrade
+item.playerinterfacemod:upgrade_transfer.name=Item-Transfer Upgrade
+item.playerinterfacemod:upgrade_comperator.name=Comperator Upgrade
+item.playerinterfacemod:upgrade_rftransfer.name=RF-Transfer Upgrade
+
+# Block descriptions
+tile.playerinterfacemod:pl_interface.description=This Block is the base of this Mod.
 
 # Item descriptions
-item.playerinterfacemod:upgrade_buffer.description=This upgrade adds a buffer ;to your Transfer Module.
-item.playerinterfacemod:upgrade_transfer.description=This module allows you to ;transfer items directly ;to your character.
-item.playerinterfacemod:upgrade_comperator.description=This module allows you to measure ;how many items are in your ;inventory using a comperator.
+item.playerinterfacemod:upgrade_transfer.description=This upgrade allows you to ;transfer items directly ;to your character.
+item.playerinterfacemod:upgrade_comperator.description=This upgrade allows you to measure ;how many items are in your ;inventory using a comperator.
+item.playerinterfacemod:upgrade_base.description=This item is used as a crafting component.
+item.playerinterfacemod:upgrade_rftransfer.description=This item allows you to automatically ;charge items in your inventory.
 
 # Strings
+string.validUpgrades=Valid Upgrades
 string.requirements=Requirements
 string.moreInformation=Press <SHIFT> for more information.
 
 # Messages
-message.playerBound=Player bound.
-message.playerUnound=Player unbound.
+message.playerBound=Player bound
+message.playerUnbound=Player unbound
 message.upgrade.installed=%s installed.
 message.upgrade.fault=%s could not be installed:
 message.upgrade.fault.unknown=Unknown error. Please post your log on my github, so I can fix this.
-meesage.upgrade.fault.invalid=This upgrade/module is not valid for this machine.
-message.upgrade.fault.alreadyInstalled=This upgrade/module is already installed.
-message.upgrade.fault.missingReq=This upgrade/module is missing the following:
+message.upgrade.fault.invalid=This upgrade is not valid for this machine.
+message.upgrade.fault.alreadyInstalled=This upgrade is already installed.
+message.upgrade.fault.missingReq=This upgrade is missing the following:
 
 # Waila
-waila.boundPlayer=Bound Player:
-waila.upgrades=Upgrades/Modules:
+waila.owner=Owner:
+waila.upgrades=Upgrades:

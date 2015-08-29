@@ -1,7 +1,7 @@
 package net.stegr.repackage.cofh.lib.util.helpers;
 
-import net.stegr.repackage.cofh.api.tileentity.IRedstoneControl;
-import net.stegr.repackage.cofh.api.tileentity.IRedstoneControl.ControlMode;
+import cofh.api.tileentity.IRedstoneControl;
+import cofh.api.tileentity.IRedstoneControl.ControlMode;
 
 import java.util.List;
 

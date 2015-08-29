@@ -12,10 +12,15 @@ public class RecipeSetVanilla extends RecipeSet
     @Override
     protected void setRecipes()
     {
-        GameRegistry.addShapedRecipe(new ItemStack(ModBlocks.player_interface), "GDG", "DID", "GDG", 'G', Blocks.gold_block, 'D', Blocks.diamond_block, 'I', Blocks.iron_block);
-        GameRegistry.addShapedRecipe(new ItemStack(ModItems.BufferUpgrade), "SIS", "GCG", "SIS", 'S', Blocks.obsidian, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'C', Blocks.chest);
-        GameRegistry.addShapedRecipe(new ItemStack(ModItems.TransferUpgrade), "SIS", "GHG", "SIS", 'S', Blocks.obsidian, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'H', Blocks.hopper);
-        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ComperatorUpgrade), "SIS", "GCG", "SIS", 'S', Blocks.obsidian, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'C', Items.comparator);
+        GameRegistry.addShapedRecipe(new ItemStack(ModBlocks.player_interface), "BGB", "GDG", "BGB", 'B', ModItems.UpgradeBase, 'G', Items.gold_ingot, 'D', Blocks.diamond_block);
+
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.UpgradeBase), "SIS", "GDG", "SIS", 'D', Blocks.obsidian, 'S', Blocks.stone, 'I', Items.iron_ingot, 'G', Items.gold_ingot);
+
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ItemTransferUpgrade), "GAI", "ABA", "IAG", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', Blocks.hopper);
+
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.ComperatorUpgrade), "GAI", "ABA", "IAG", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', Items.comparator);
+
+        GameRegistry.addShapedRecipe(new ItemStack(ModItems.RFTransferUpgrade), "IAG", "ABA", "GAI", 'B', ModItems.UpgradeBase, 'I', Items.iron_ingot, 'G', Items.gold_ingot, 'A', Items.repeater);
     }
 
     @Override
