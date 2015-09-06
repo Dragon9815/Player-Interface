@@ -1,7 +1,10 @@
 package net.stegr.playerinterfacemod.block;
 
+import cofh.api.block.IDismantleable;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.dragon9815.dragoncore.block.BlockUpgradeable;
+import net.dragon9815.dragoncore.registry.UpgradeRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,21 +16,22 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.stegr.playerinterfacemod.creativetab.CreativeTabPlim;
 import net.stegr.playerinterfacemod.reference.MachineNames;
+import net.stegr.playerinterfacemod.reference.Reference;
 import net.stegr.playerinterfacemod.reference.UpgradeNames;
 import net.stegr.playerinterfacemod.tileentity.TileEntityPlayerInterface;
-import net.stegr.playerinterfacemod.tileentity.TileEntityUpgradeable;
 import net.stegr.playerinterfacemod.utility.Platform;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 
-public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements IBlockUpgradeable //, IDismantleable
-{
-    public BlockPlayerInterface()
-    {
+public class BlockPlayerInterface extends BlockUpgradeable implements IDismantleable {
+    public BlockPlayerInterface() {
         super(Material.iron);
         this.setBlockName(MachineNames.PLAYER_INTERFACE);
+        this.setCreativeTab(CreativeTabPlim.PLIM_TAB);
         this.setBlockTextureName("");
 
         //this.setHarvestLevel("iron", 2);
@@ -38,8 +42,22 @@ public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements 
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9)
-    {
+    public String getModID() {
+        return Reference.MOD_ID;
+    }
+
+    @Override
+    public int getNumUpgradeSlots() {
+        return 5;
+    }
+
+    @Override
+    public ItemStack[] getValidUpgrades() {
+        return new ItemStack[]{new ItemStack(UpgradeRegistry.instance().getUpgrade(UpgradeNames.ITEMTRANSFER), 1), new ItemStack(UpgradeRegistry.instance().getUpgrade(UpgradeNames.RFTRANSFER), 1), new ItemStack(UpgradeRegistry.instance().getUpgrade(UpgradeNames.COMPERATOR), 1)};
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9) {
         /*if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9) && !world.isRemote)
         {
            TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
@@ -82,22 +100,14 @@ public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements 
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int metadata)
-    {
+    public TileEntity createNewTileEntity(World world, int metadata) {
         return new TileEntityPlayerInterface();
     }
 
-    @Override
-    public int getUpgradeSlots()
-    {
-        return 5;
-    }
-
-
-    /*@Override // TODO: Fix CoFH dismantle Block
+    @Override // TODO: Fix CoFH dismantle Block
     public ArrayList<ItemStack> dismantleBlock(EntityPlayer player, World world, int x, int y, int z, boolean returnDrops)
     {
-        ArrayList<ItemStack> retStacks = new ArrayList<ItemStack>();
+        /*ArrayList<ItemStack> retStacks = new ArrayList<ItemStack>();
         ItemStack[] upgrades;
         TileEntity te = world.getTileEntity(x, y, z);
 
@@ -113,7 +123,7 @@ public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements 
             }
         }
 
-        return retStacks;
+        return retStacks;*/
         return new ArrayList<ItemStack>();
     }
 
@@ -121,21 +131,18 @@ public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements 
     public boolean canDismantle(EntityPlayer player, World world, int x, int y, int z)
     {
         return true;
-    }*/
+    }
 
     @Override
-    public boolean hasComparatorInputOverride()
-    {
+    public boolean hasComparatorInputOverride() {
         return true;
     }
 
     @Override
-    public int getComparatorInputOverride(World world, int x, int y, int z, int meta)
-    {
-        TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
+    public int getComparatorInputOverride(World world, int x, int y, int z, int meta) {
+        TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
-        if(te != null && te.getOwner() != null && te.hasUpgrade(UpgradeNames.COMPERATOR) && !world.isRemote)
-        {
+        if (te != null && te.getOwner() != null && te.hasUpgrade(UpgradeNames.COMPERATOR) && !world.isRemote) {
             return Container.calcRedstoneFromInventory(te.getOwner().inventory);
         }
 
@@ -143,16 +150,14 @@ public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements 
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack)
-    {
-        if(Platform.isClient())
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack) {
+        if (Platform.isClient()) {
             return;
+        }
 
-        if(entity instanceof EntityPlayer && !(entity instanceof FakePlayer))
-        {
-            EntityPlayer player = (EntityPlayer)entity;
-            if (world.getTileEntity(x, y, z) instanceof TileEntityPlayerInterface)
-            {
+        if (entity instanceof EntityPlayer && !(entity instanceof FakePlayer)) {
+            EntityPlayer player = (EntityPlayer) entity;
+            if (world.getTileEntity(x, y, z) instanceof TileEntityPlayerInterface) {
                 TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
                 te.bindPlayer(player.getUniqueID());
@@ -162,43 +167,36 @@ public class BlockPlayerInterface extends BlockTileEntityUpgradeable implements 
     }
 
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta)
-    {
-        TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
+    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+        TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
 
         te.dropAllItemsInBuffer(world, x, y, z);
 
         super.breakBlock(world, x, y, z, block, meta);
     }
 
-    public int getRenderType()
-    {
+    public int getRenderType() {
         return -1;
     }
 
-    public boolean isOpaqueCube()
-    {
+    public boolean isOpaqueCube() {
         return false;
     }
 
-    public boolean renderAsNormalBlock()
-    {
+    public boolean renderAsNormalBlock() {
         return false;
     }
 
-    public int getLightOpacity()
-    {
+    public int getLightOpacity() {
         return 0;
     }
 
-    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side)
-    {
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
         return (side == ForgeDirection.UP || side == ForgeDirection.DOWN);
     }
 
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World world, int x, int y, int z, Random random)
-    {
+    public void randomDisplayTick(World world, int x, int y, int z, Random random) {
         /*TileEntityPlayerInterface te = (TileEntityPlayerInterface)world.getTileEntity(x, y, z);
 
         if(te != null && te.transfered && te.getBoundPlayer() != null)

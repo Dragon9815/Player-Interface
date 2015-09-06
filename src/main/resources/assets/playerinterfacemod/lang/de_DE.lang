@@ -29,12 +29,6 @@ string.moreInformation=Drücke <SHIFT> für mehr Information.
 # Messages
 message.playerBound=Spieler gebunden
 message.playerUnbound=Spieler entbunden
-message.upgrade.installed=%s wurde installiert.
-message.upgrade.fault=%s konnte nicht installiert werden:
-message.upgrade.fault.unknown=Unknown error. Please post your log on my github, so I can fix this.
-meesage.upgrade.fault.invalid=Dieses Upgrade ist nicht gültig für diese Maschine.
-message.upgrade.fault.alreadyInstalled=Dieses Upgrade ist bereits installiert.
-message.upgrade.fault.missingReq=Um das Upgrade zu installieren fehlt das folgende:
 
 # Waila
 waila.owner=Besitzer:

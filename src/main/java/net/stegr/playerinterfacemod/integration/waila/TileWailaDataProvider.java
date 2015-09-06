@@ -13,28 +13,23 @@ import net.stegr.playerinterfacemod.integration.waila.tile.PlayerInterfaceWailaD
 
 import java.util.List;
 
-public final class TileWailaDataProvider implements IWailaDataProvider
-{
+public final class TileWailaDataProvider implements IWailaDataProvider {
     private final List<IWailaDataProvider> providers;
 
-    public TileWailaDataProvider()
-    {
+    public TileWailaDataProvider() {
         final IWailaDataProvider playerInterface = new PlayerInterfaceWailaDataProvider();
 
         this.providers = Lists.newArrayList(playerInterface);
     }
 
     @Override
-    public ItemStack getWailaStack(IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler)
-    {
+    public ItemStack getWailaStack(IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler) {
         return null;
     }
 
     @Override
-    public List<String> getWailaHead(ItemStack itemStack, List<String> currentToolTip, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler)
-    {
-        for(IWailaDataProvider provider : this.providers)
-        {
+    public List<String> getWailaHead(ItemStack itemStack, List<String> currentToolTip, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler) {
+        for (IWailaDataProvider provider : this.providers) {
             provider.getWailaHead(itemStack, currentToolTip, iWailaDataAccessor, iWailaConfigHandler);
         }
 
@@ -42,10 +37,8 @@ public final class TileWailaDataProvider implements IWailaDataProvider
     }
 
     @Override
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currentToolTip, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler)
-    {
-        for(IWailaDataProvider provider : this.providers)
-        {
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currentToolTip, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler) {
+        for (IWailaDataProvider provider : this.providers) {
             provider.getWailaBody(itemStack, currentToolTip, iWailaDataAccessor, iWailaConfigHandler);
         }
 
@@ -53,10 +46,8 @@ public final class TileWailaDataProvider implements IWailaDataProvider
     }
 
     @Override
-    public List<String> getWailaTail(ItemStack itemStack, List<String> currentToolTip, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler)
-    {
-        for(IWailaDataProvider provider : this.providers)
-        {
+    public List<String> getWailaTail(ItemStack itemStack, List<String> currentToolTip, IWailaDataAccessor iWailaDataAccessor, IWailaConfigHandler iWailaConfigHandler) {
+        for (IWailaDataProvider provider : this.providers) {
             provider.getWailaTail(itemStack, currentToolTip, iWailaDataAccessor, iWailaConfigHandler);
         }
 
@@ -64,10 +55,8 @@ public final class TileWailaDataProvider implements IWailaDataProvider
     }
 
     @Override
-    public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity tileEntity, NBTTagCompound tag, World world, int x, int y, int z)
-    {
-        for(IWailaDataProvider provider : this.providers)
-        {
+    public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity tileEntity, NBTTagCompound tag, World world, int x, int y, int z) {
+        for (IWailaDataProvider provider : this.providers) {
             provider.getNBTData(player, tileEntity, tag, world, x, y, z);
         }
 

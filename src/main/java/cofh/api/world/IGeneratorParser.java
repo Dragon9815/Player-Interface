@@ -1,6 +1,6 @@
 package cofh.api.world;
 
-import net.stegr.repackage.cofh.lib.util.WeightedRandomBlock;
+import cofh.lib.util.WeightedRandomBlock;
 import com.google.gson.JsonObject;
 
 import java.util.List;

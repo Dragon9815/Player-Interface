@@ -5,28 +5,23 @@ import net.stegr.playerinterfacemod.handler.ConfigurationHandler;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RecipeRegistry
-{
-    private static Map<ConfigurationHandler.Recipes, RecipeSet> recipes;
-
+public class RecipeRegistry {
     private final static RecipeSet VanillaRecipes = new RecipeSetVanilla();
     private final static RecipeSet ThermalExpansionRecipes = new RecipeSetThermalExpansion();
+    private static Map<ConfigurationHandler.Recipes, RecipeSet> recipes;
 
-    public static void init()
-    {
+    public static void init() {
         recipes = new HashMap<ConfigurationHandler.Recipes, RecipeSet>();
 
         addRecipeSet(VanillaRecipes, ConfigurationHandler.Recipes.VANILLA);
         addRecipeSet(ThermalExpansionRecipes, ConfigurationHandler.Recipes.THERMALEXPANSION);
     }
 
-    private static void addRecipeSet(RecipeSet set, ConfigurationHandler.Recipes recipeType)
-    {
+    private static void addRecipeSet(RecipeSet set, ConfigurationHandler.Recipes recipeType) {
         recipes.put(recipeType, set);
     }
 
-    public static  void loadRecipes(ConfigurationHandler.Recipes recipeType)
-    {
+    public static void loadRecipes(ConfigurationHandler.Recipes recipeType) {
         RecipeSet set = recipes.get(recipeType);
 
         set.init();

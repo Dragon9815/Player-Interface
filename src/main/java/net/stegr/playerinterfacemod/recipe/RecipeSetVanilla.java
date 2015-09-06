@@ -7,11 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.stegr.playerinterfacemod.init.ModBlocks;
 import net.stegr.playerinterfacemod.init.ModItems;
 
-public class RecipeSetVanilla extends RecipeSet
-{
+public class RecipeSetVanilla extends RecipeSet {
     @Override
-    protected void setRecipes()
-    {
+    protected void setRecipes() {
         GameRegistry.addShapedRecipe(new ItemStack(ModBlocks.player_interface), "BGB", "GDG", "BGB", 'B', ModItems.UpgradeBase, 'G', Items.gold_ingot, 'D', Blocks.diamond_block);
 
         GameRegistry.addShapedRecipe(new ItemStack(ModItems.UpgradeBase), "SIS", "GDG", "SIS", 'D', Blocks.obsidian, 'S', Blocks.stone, 'I', Items.iron_ingot, 'G', Items.gold_ingot);
@@ -24,14 +22,12 @@ public class RecipeSetVanilla extends RecipeSet
     }
 
     @Override
-    protected void getItems()
-    {
+    protected void getItems() {
 
     }
 
     @Override
-    public void init()
-    {
+    public void init() {
         getItems();
         setRecipes();
     }

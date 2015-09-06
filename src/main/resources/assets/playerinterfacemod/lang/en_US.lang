@@ -19,21 +19,9 @@ item.playerinterfacemod:upgrade_comperator.description=This upgrade allows you t
 item.playerinterfacemod:upgrade_base.description=This item is used as a crafting component.
 item.playerinterfacemod:upgrade_rftransfer.description=This item allows you to automatically ;charge items in your inventory.
 
-# Strings
-string.validUpgrades=Valid Upgrades
-string.requirements=Requirements
-string.moreInformation=Press <SHIFT> for more information.
-
 # Messages
 message.playerBound=Player bound
 message.playerUnbound=Player unbound
-message.upgrade.installed=%s installed.
-message.upgrade.fault=%s could not be installed:
-message.upgrade.fault.unknown=Unknown error. Please post your log on my github, so I can fix this.
-message.upgrade.fault.invalid=This upgrade is not valid for this machine.
-message.upgrade.fault.alreadyInstalled=This upgrade is already installed.
-message.upgrade.fault.missingReq=This upgrade is missing the following:
 
 # Waila
 waila.owner=Owner:
-waila.upgrades=Upgrades:

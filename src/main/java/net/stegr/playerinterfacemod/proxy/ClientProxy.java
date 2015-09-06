@@ -11,11 +11,9 @@ import net.stegr.playerinterfacemod.client.renderer.tileentity.PlayerInterfaceRe
 import net.stegr.playerinterfacemod.init.ModBlocks;
 import net.stegr.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 
-public class ClientProxy extends CommonProxy
-{
+public class ClientProxy extends CommonProxy {
     @Override
-    public EntityPlayer getClientPlayer()
-    {
+    public EntityPlayer getClientPlayer() {
         return Minecraft.getMinecraft().thePlayer;
     }
 

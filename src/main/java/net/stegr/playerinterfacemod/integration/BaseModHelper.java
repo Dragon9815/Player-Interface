@@ -3,45 +3,35 @@ package net.stegr.playerinterfacemod.integration;
 import cpw.mods.fml.common.Loader;
 import net.stegr.playerinterfacemod.helpers.LogHelper;
 
-public abstract class BaseModHelper
-{
+public abstract class BaseModHelper {
     protected boolean loaded;
 
-    public BaseModHelper()
-    {
+    public BaseModHelper() {
         this.loaded = false;
     }
 
-    public boolean isLoaded()
-    {
+    public boolean isLoaded() {
         return this.loaded;
     }
 
-    public void init()
-    {
-        if(Loader.isModLoaded(this.getModId()))
-        {
-            try
-            {
+    public void init() {
+        if (Loader.isModLoaded(this.getModId())) {
+            try {
                 this.load();
 
                 LogHelper.info("ModHelper loaded for " + this.getModId());
                 this.loaded = true;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        if(!this.loaded)
-        {
+        if (!this.loaded) {
             LogHelper.info("ModHelper not loaded for " + this.getModId());
         }
     }
 
-    public void load() throws Exception
-    {
+    public void load() throws Exception {
 
     }
 

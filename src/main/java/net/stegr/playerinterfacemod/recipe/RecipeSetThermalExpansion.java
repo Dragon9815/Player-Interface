@@ -8,14 +8,13 @@ import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.stegr.playerinterfacemod.helpers.LogHelper;
 import net.stegr.playerinterfacemod.init.ModBlocks;
 import net.stegr.playerinterfacemod.init.ModItems;
-import net.stegr.playerinterfacemod.helpers.LogHelper;
 
 import java.util.Collections;
 
-public class RecipeSetThermalExpansion extends RecipeSet
-{
+public class RecipeSetThermalExpansion extends RecipeSet {
     private static final String TE = "ThermalExpansion";
     private static final String TD = "ThermalDynamics";
 
@@ -25,13 +24,11 @@ public class RecipeSetThermalExpansion extends RecipeSet
     private static ItemStack resonantFluxduct;
 
 
-    public void init()
-    {
+    public void init() {
         boolean TELoaded = Loader.isModLoaded(TE);
         boolean TDLoaded = Loader.isModLoaded(TD);
 
-        if(!TELoaded || !TDLoaded)
-        {
+        if (!TELoaded || !TDLoaded) {
             LogHelper.fatal("Thermal Expansion and Thermal Dynamics is required for Thermal Expansion recipes.");
             throw new MissingModsException(Collections.singleton((ArtifactVersion) new DefaultArtifactVersion((!TELoaded) ? TE : TD)));
         }
@@ -40,8 +37,7 @@ public class RecipeSetThermalExpansion extends RecipeSet
         setRecipes();
     }
 
-    public void getItems()
-    {
+    public void getItems() {
         /* Blocks */
         tesseract = new ItemStack(GameRegistry.findBlock(TE, "Tesseract"), 1, 0);
         warpItemduct = new ItemStack(GameRegistry.findBlock(TD, "ThermalDynamics_32"), 1, 4);
@@ -51,8 +47,7 @@ public class RecipeSetThermalExpansion extends RecipeSet
 		/* Items */
     }
 
-    public void setRecipes()
-    {
+    public void setRecipes() {
         GameRegistry.addShapedRecipe(new ItemStack(ModBlocks.player_interface), "BGB", "GDG", "BGB", 'B', ModItems.UpgradeBase, 'G', Items.gold_ingot, 'D', tesseract);
 
         GameRegistry.addShapedRecipe(new ItemStack(ModItems.UpgradeBase), "SIS", "GDG", "SIS", 'D', Blocks.obsidian, 'S', Blocks.stone, 'I', Items.iron_ingot, 'G', Items.gold_ingot);

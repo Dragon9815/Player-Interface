@@ -1,6 +1,6 @@
 package cofh.api.modhelpers;
 
-import net.stegr.repackage.cofh.lib.util.helpers.ItemHelper;
+import cofh.lib.util.helpers.ItemHelper;
 import cpw.mods.fml.common.Loader;
 
 import java.lang.reflect.Method;

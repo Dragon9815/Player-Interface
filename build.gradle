@@ -17,42 +17,31 @@ buildscript {
 
 apply plugin: 'forge'
 
-repositories {
-    maven { // The repo from which to get waila
-        name "Mobius Repo"
-        url "http://mobiusstrip.eu/maven"
-    }
-}
-dependencies {
-    compile('mcp.mobius.waila:Waila:1.5.11-RC2-NONEI_1.7.10:dev') {
-        exclude group: 'mcp.mobius.waila'
-    }
-	
-	compile(files('libs/CoFHLib-[1.7.10]1.0.3-175-dev.jar'))
-}
-
 logger.lifecycle "Build number: ${artifactBuildNumber}"
 
 version = "${minecraft_version}-${artifactMajorVersion}-${artifactBuildNumber}"
 group= "net.stegr.playerinterfacemod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "PlayerInterfaceMod"
 
-Properties props = new Properties()
-File propsFile = new File('gradle.properties')
-props.load(propsFile.newDataInputStream())
-
-Integer next_buildnumber = ( (props.getProperty('artifactBuildNumber') as BigDecimal) + 1 )
-props.setProperty('artifactBuildNumber', next_buildnumber.toString())
-
-props.store(propsFile.newWriter(), null)
-
 minecraft {
     version = "1.7.10-10.13.4.1448-1.7.10"
     runDir = "eclipse"
 }
 
+repositories {
+    maven { // The repo from which to get waila
+        name "Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
+    }
+}
+
 dependencies {
+	compile("mcp.mobius.waila:Waila:${waila_version}_${minecraft_version}:dev") {
+        exclude group: 'mcp.mobius.waila'
+    }
 	
+	// compile(files('libs/CoFHLib-[1.7.10]1.0.3-175-dev.jar'))
+	compile(files("libs/DragonCore-${dragoncore_version}-dev.jar"))
 }
 
 processResources
@@ -74,3 +63,32 @@ processResources
         exclude 'mcmod.info'
     }
 }
+
+task devJar(type: Jar, dependsOn: 'jar') {
+
+    from(sourceSets.main.output) {
+        include "net/**"
+        include "assets/**"
+        include 'mcmod.info'
+    }
+
+    classifier = 'dev'
+}
+
+task increaseBuildBumber << {
+	Properties props = new Properties()
+	File propsFile = new File('gradle.properties')
+	props.load(propsFile.newDataInputStream())
+
+	Integer next_buildnumber = ( (props.getProperty('artifactBuildNumber') as BigDecimal) + 1 )
+	props.setProperty('artifactBuildNumber', next_buildnumber.toString())
+
+	props.store(propsFile.newWriter(), null)
+}
+
+artifacts {
+	archives devJar
+}
+
+//tasks.build.dependsOn('devJar')
+tasks.build.dependsOn('increaseBuildBumber')
