@@ -8,4 +8,9 @@ public class ServerProxy extends CommonProxy {
     public EntityPlayer getClientPlayer() {
         return null;
     }
+
+    @Override
+    public void registerClientStuff() {
+
+    }
 }

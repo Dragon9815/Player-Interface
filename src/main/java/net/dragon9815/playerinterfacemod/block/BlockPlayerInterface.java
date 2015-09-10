@@ -5,6 +5,9 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.dragon9815.dragoncore.block.BlockUpgradeable;
 import net.dragon9815.dragoncore.registry.UpgradeRegistry;
+import net.dragon9815.playerinterfacemod.PlayerInterfaceMod;
+import net.dragon9815.playerinterfacemod.client.gui.GuiSideConfig;
+import net.dragon9815.playerinterfacemod.item.ItemWrench;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -58,45 +61,14 @@ public class BlockPlayerInterface extends BlockUpgradeable implements IDismantle
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9) {
-        /*if(!super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9) && !world.isRemote)
-        {
-           TileEntityPlayerInterface te = (TileEntityPlayerInterface) world.getTileEntity(x, y, z);
+        super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9);
 
-            if (!(player instanceof FakePlayer))
-            {
-                if (player.isSneaking())
-                {
-                    if (te.getOwner() != null && te.getOwner().getUniqueID().equals(player.getUniqueID()))
-                    {
-                        te.bindPlayer((EntityPlayer)null);
-                        te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
-                        if(!world.isRemote)
-                        {
-                            player.addChatMessage(new ChatComponentText(StringHelper.LIGHT_BLUE + ("" + StringHelper.localize("message.playerUnbound"))));
-                            LogHelper.info("Player unbound");
-                        }
-                    }
-                }
-                else
-                {
-                    if (te.getOwner() == null)
-                    {
-                        te.bindPlayer(player);
-                        te.getWorldObj().markBlockForUpdate(te.xCoord, te.yCoord, te.zCoord);
-                        if(!world.isRemote)
-                        {
-                            player.addChatMessage(new ChatComponentText(StringHelper.LIGHT_BLUE + ("" + StringHelper.localize("message.playerBound") + ": " + player.getDisplayName())));
-                            LogHelper.info("Player bound: " + player.getUniqueID().toString());
-                        }
-                    }
-                }
-            }
-
+        if(player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemWrench) {
+            player.openGui(PlayerInterfaceMod.instance, GuiSideConfig.GUI_ID, world, x, y, z);
+            return true;
         }
 
-        return true;*/
-
-        return super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9);
+        return false;
     }
 
     @Override
@@ -107,23 +79,6 @@ public class BlockPlayerInterface extends BlockUpgradeable implements IDismantle
     @Override // TODO: Fix CoFH dismantle Block
     public ArrayList<ItemStack> dismantleBlock(EntityPlayer player, World world, int x, int y, int z, boolean returnDrops)
     {
-        /*ArrayList<ItemStack> retStacks = new ArrayList<ItemStack>();
-        ItemStack[] upgrades;
-        TileEntity te = world.getTileEntity(x, y, z);
-
-        if(te instanceof  TileEntityPlayerInterface)
-        {
-            TileEntityPlayerInterface playerInterface = (TileEntityPlayerInterface)te;
-
-            upgrades = playerInterface.getUpgradeInventory().getInstalledUpgrades();
-
-            for(ItemStack upgrade : upgrades)
-            {
-                retStacks.add(upgrade);
-            }
-        }
-
-        return retStacks;*/
         return new ArrayList<ItemStack>();
     }
 

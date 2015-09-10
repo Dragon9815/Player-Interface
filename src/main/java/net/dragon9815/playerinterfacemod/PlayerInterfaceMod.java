@@ -9,6 +9,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import net.dragon9815.dragoncore.registry.UpgradeRegistry;
+import net.dragon9815.playerinterfacemod.handler.GuiEventHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.dragon9815.playerinterfacemod.handler.ConfigurationHandler;
 import net.dragon9815.playerinterfacemod.handler.PlimEventHandler;
@@ -33,20 +34,17 @@ public class PlayerInterfaceMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        ModTileEntities.init();
-        ModBlocks.init();
-        ModItems.init();
-
-        PacketHandler.init();
 
         ConfigurationHandler.init(event.getSuggestedConfigurationFile());
 
+        proxy.registerRenderers();
+        proxy.registerClientStuff();
+        proxy.registerServerStuff();
+        proxy.registerCommonStuff();
+
         UpgradeRegistry.instance().registerUpgrade(ModItems.ItemTransferUpgrade);
-        //UpgradeRegistry.instance().registerUpgrade(ModItems.ItemBufferUpgrade);
         UpgradeRegistry.instance().registerUpgrade(ModItems.RFTransferUpgrade);
         UpgradeRegistry.instance().registerUpgrade(ModItems.ComperatorUpgrade);
-
-        proxy.registerRenderers();
     }
 
     @EventHandler
@@ -58,8 +56,7 @@ public class PlayerInterfaceMod {
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, proxy);
         MinecraftForge.EVENT_BUS.register(new PlimEventHandler());
+        MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
         FMLCommonHandler.instance().bus().register(new PlimEventHandler());
-
-        LogHelper.info(">>> Buildcraft Loaded: " + Loader.isModLoaded(ModIDs.BUILDCRAFT));
     }
 }

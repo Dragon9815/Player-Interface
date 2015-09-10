@@ -2,19 +2,22 @@ package net.dragon9815.playerinterfacemod.client.gui;
 
 import net.dragon9815.dragoncore.helpers.LogHelper;
 import net.dragon9815.playerinterfacemod.container.ContainerPlayerInterface;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
+import net.dragon9815.playerinterfacemod.container.ContainerTrash;
+import net.dragon9815.playerinterfacemod.inventory.InventoryTrash;
 import net.dragon9815.playerinterfacemod.reference.Reference;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
+import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.InventoryEffectRenderer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
-public class GuiSideConfig extends GuiContainer {
-    public static final int GUI_ID = 1;
+public class GuiTrashInventory extends InventoryEffectRenderer {
+    public static final int GUI_ID = 2;
+
+    public InventoryPlayer invPlayer;
+    public InventoryTrash invTrash;
 
     private int xSize = 176;
     private int ySize = 166;
@@ -23,12 +26,11 @@ public class GuiSideConfig extends GuiContainer {
 
     private static final ResourceLocation texture = new ResourceLocation(Reference.MOD_ID, "textures/gui/side_config.png");
 
-    private TileEntityPlayerInterface playerInterface;
+    public GuiTrashInventory(InventoryPlayer inventoryPlayer, InventoryTrash inventoryTrash) {
+        super(new ContainerTrash(inventoryPlayer, inventoryTrash));
 
-    public GuiSideConfig(ContainerPlayerInterface container, TileEntityPlayerInterface playerInterface) {
-        super(container);
-
-        this.playerInterface = playerInterface;
+        this.invPlayer = inventoryPlayer;
+        this.invTrash = inventoryTrash;
     }
 
     @Override

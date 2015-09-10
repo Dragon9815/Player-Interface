@@ -20,7 +20,7 @@ apply plugin: 'forge'
 logger.lifecycle "Build number: ${artifactBuildNumber}"
 
 version = "${minecraft_version}-${artifactMajorVersion}-${artifactBuildNumber}"
-group= "net.stegr.playerinterfacemod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group= "net.dragon9815.playerinterfacemod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "PlayerInterfaceMod"
 
 minecraft {
@@ -42,6 +42,12 @@ dependencies {
 	
 	// compile(files('libs/CoFHLib-[1.7.10]1.0.3-175-dev.jar'))
 	compile(files("libs/DragonCore-${dragoncore_version}-dev.jar"))
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'playerinterface_at.cfg'
+    }
 }
 
 processResources

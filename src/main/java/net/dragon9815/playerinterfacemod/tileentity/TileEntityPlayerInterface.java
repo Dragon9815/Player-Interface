@@ -8,6 +8,7 @@ import net.dragon9815.dragoncore.block.BlockUpgradeable;
 import net.dragon9815.dragoncore.item.ItemUpgrade;
 import net.dragon9815.dragoncore.registry.UpgradeRegistry;
 import net.dragon9815.dragoncore.tileentity.TileEntityUpgradeable;
+import net.dragon9815.playerinterfacemod.inventory.InventoryTrash;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +29,8 @@ import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
 import net.dragon9815.playerinterfacemod.registry.InterfaceRegistry;
 import net.dragon9815.playerinterfacemod.utility.WrappedInventory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class TileEntityPlayerInterface extends TileEntityUpgradeable implements ISidedInventory, IEnergyReceiver {
@@ -45,7 +48,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     private UUID ownerUUID;
     private boolean isOwnerBound;
     private boolean changed;
-    private EnergyStorage energyStorage;
+    public byte[][] sideConfiguration;
+    private InventoryTrash inventoryTrash;
     // -------------------------------------------------------
     private boolean isInit;
     private int transferCooldown;
@@ -60,8 +64,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         bufferSlots = new ItemStack[9];
         playerInventoryPrev = new WrappedInventory(40);
-
-        energyStorage = new EnergyStorage(1000);
 
         playerName = null;
         isPlayerOnline = true;
@@ -83,6 +85,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         if (!isInit) {
             if (isOwnerBound) {
                 InterfaceRegistry.addInterface(new InterfaceRegistry.InterfaceDataContainer(this));
+
+                sideConfiguration = new byte[ForgeDirection.VALID_DIRECTIONS.length][40]; // 36 Inventory Slots + 4 Armor Slots (+ 5 Trash Slots) TODO: Add Trash-Slots
 
                 this.isInit = true;
             }
@@ -176,9 +180,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     }
 
     private void onChange() {
-        this.energyStorage.setMaxTransfer(this.getUpgradeInventory().getNumInstalled(UpgradeNames.RFTRANSFER) * 250);
-        this.energyStorage.setCapacity(this.getUpgradeInventory().getNumInstalled(UpgradeNames.RFTRANSFER) * 250);
-
         for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
             if (worldObj.getBlock(xCoord + direction.offsetX, yCoord + direction.offsetY, zCoord + direction.offsetZ) instanceof BlockRedstoneComparator) {
                 worldObj.notifyBlockOfNeighborChange(xCoord + direction.offsetX, yCoord + direction.offsetY, zCoord + direction.offsetZ, worldObj.getBlock(xCoord, yCoord, zCoord));
@@ -427,11 +428,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
     @Override
     public void onUpgrade(ItemUpgrade upgrade) {
-        if (upgrade instanceof UpgradeRFTransfer) {
-            this.energyStorage.setMaxTransfer(this.energyStorage.getMaxExtract() + 250);
-            this.energyStorage.setCapacity(this.energyStorage.getMaxEnergyStored() + 250);
-        }
-
         changed = true;
     }
 
