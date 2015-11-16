@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.dragon9815.dragoncore.block.BlockUpgradeable;
 import net.dragon9815.dragoncore.registry.UpgradeRegistry;
+import net.dragon9815.dragoncore.util.Platform;
 import net.dragon9815.playerinterfacemod.PlayerInterfaceMod;
 import net.dragon9815.playerinterfacemod.client.gui.GuiSideConfig;
 import net.dragon9815.playerinterfacemod.creativetab.CreativeTabPlim;
@@ -25,6 +26,14 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
+<<<<<<< Updated upstream
+=======
+import net.dragon9815.playerinterfacemod.creativetab.CreativeTabPlim;
+import net.dragon9815.playerinterfacemod.reference.MachineNames;
+import net.dragon9815.playerinterfacemod.reference.Reference;
+import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
+import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+>>>>>>> Stashed changes
 
 import java.util.ArrayList;
 import java.util.Random;

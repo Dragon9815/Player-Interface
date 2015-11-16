@@ -8,6 +8,7 @@ public class GuiEventHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void GuiOpenEvent(GuiOpenEvent event) {
+<<<<<<< Updated upstream
         /*if(event.gui instanceof GuiInventory && !(event.gui instanceof GuiInventoryModified)) {
             LogHelper.info(">>> Attempted to open Inventory");
 
@@ -17,5 +18,8 @@ public class GuiEventHandler {
 
             event.setCanceled(true);
         }*/
+=======
+
+>>>>>>> Stashed changes
     }
 }
