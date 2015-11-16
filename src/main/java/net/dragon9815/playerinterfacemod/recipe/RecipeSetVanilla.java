@@ -1,11 +1,11 @@
 package net.dragon9815.playerinterfacemod.recipe;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.dragon9815.playerinterfacemod.init.ModBlocks;
+import net.dragon9815.playerinterfacemod.init.ModItems;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.dragon9815.playerinterfacemod.init.ModBlocks;
-import net.dragon9815.playerinterfacemod.init.ModItems;
 
 public class RecipeSetVanilla extends RecipeSet {
     @Override

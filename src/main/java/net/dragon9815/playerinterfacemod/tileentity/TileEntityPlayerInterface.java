@@ -1,6 +1,5 @@
 package net.dragon9815.playerinterfacemod.tileentity;
 
-import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyContainerItem;
 import cofh.api.energy.IEnergyReceiver;
 import cofh.lib.util.helpers.EnergyHelper;
@@ -8,7 +7,13 @@ import net.dragon9815.dragoncore.block.BlockUpgradeable;
 import net.dragon9815.dragoncore.item.ItemUpgrade;
 import net.dragon9815.dragoncore.registry.UpgradeRegistry;
 import net.dragon9815.dragoncore.tileentity.TileEntityUpgradeable;
+import net.dragon9815.playerinterfacemod.helpers.LogHelper;
+import net.dragon9815.playerinterfacemod.helpers.PlayerHelper;
+import net.dragon9815.playerinterfacemod.init.ModBlocks;
 import net.dragon9815.playerinterfacemod.inventory.InventoryTrash;
+import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
+import net.dragon9815.playerinterfacemod.registry.InterfaceRegistry;
+import net.dragon9815.playerinterfacemod.utility.WrappedInventory;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,16 +26,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.dragon9815.playerinterfacemod.helpers.LogHelper;
-import net.dragon9815.playerinterfacemod.helpers.PlayerHelper;
-import net.dragon9815.playerinterfacemod.init.ModBlocks;
-import net.dragon9815.playerinterfacemod.item.upgrade.UpgradeRFTransfer;
-import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
-import net.dragon9815.playerinterfacemod.registry.InterfaceRegistry;
-import net.dragon9815.playerinterfacemod.utility.WrappedInventory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class TileEntityPlayerInterface extends TileEntityUpgradeable implements ISidedInventory, IEnergyReceiver {
@@ -41,6 +37,7 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     // SYNC Variables
     public String playerName;
     public boolean isPlayerOnline;
+    public byte[][] sideConfiguration;
     protected WrappedInventory playerInventoryPrev;
     // -------------------------------------------------------
     // SERVER only
@@ -48,7 +45,6 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
     private UUID ownerUUID;
     private boolean isOwnerBound;
     private boolean changed;
-    public byte[][] sideConfiguration;
     private InventoryTrash inventoryTrash;
     // -------------------------------------------------------
     private boolean isInit;
@@ -227,7 +223,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         if (slot < this.bufferSlots.length) {
             var1 = bufferSlots[slot];
-        } else if (this.hasOwner()) {
+        }
+        else if (this.hasOwner()) {
             var1 = owner.inventory.getStackInSlot(slot - ((this.hasUpgrade(UpgradeNames.ITEMTRANSFER)) ? this.bufferSlots.length : 0));
         }
 
@@ -375,7 +372,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
 
         if (!uuid.equals("")) {
             this.bindPlayer(UUID.fromString(uuid));
-        } else {
+        }
+        else {
             this.owner = null;
         }
 
@@ -402,7 +400,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
         if (side == ForgeDirection.DOWN.ordinal()) {
             numSlots = (owner == null) ? 0 : owner.inventory.getSizeInventory();
             startSlot = BUFFER_SLOTS;
-        } else {
+        }
+        else {
             numSlots = BUFFER_SLOTS;
             startSlot = 0;
         }
@@ -451,7 +450,8 @@ public class TileEntityPlayerInterface extends TileEntityUpgradeable implements 
                 UUID uuid = UUID.fromString(playerUUIDString);
                 this.tryToBindPlayer(uuid);
                 return;
-            } catch (IllegalArgumentException ex) {
+            }
+            catch (IllegalArgumentException ex) {
                 LogHelper.info(">>> My UUID thingy broke: ");
                 ex.printStackTrace();
             }

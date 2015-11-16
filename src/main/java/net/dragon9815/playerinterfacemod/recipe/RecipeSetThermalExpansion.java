@@ -5,12 +5,12 @@ import cpw.mods.fml.common.MissingModsException;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.dragon9815.playerinterfacemod.helpers.LogHelper;
 import net.dragon9815.playerinterfacemod.init.ModBlocks;
 import net.dragon9815.playerinterfacemod.init.ModItems;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 
 import java.util.Collections;
 

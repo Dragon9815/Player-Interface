@@ -28,7 +28,7 @@ public class WailaModHelper extends BaseModHelper {
     }
 
     @Override
-    public void load() throws Exception {
-        FMLInterModComms.sendMessage("Waila", "register", this.getClass().getName() + ".register");
+    public boolean load() throws Exception {
+        return FMLInterModComms.sendMessage("Waila", "register", this.getClass().getName() + ".register");
     }
 }

@@ -2,11 +2,11 @@ package net.dragon9815.playerinterfacemod.handler;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.event.world.BlockEvent;
 import net.dragon9815.playerinterfacemod.block.BlockPlayerInterface;
 import net.dragon9815.playerinterfacemod.registry.InterfaceRegistry;
 import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.world.BlockEvent;
 
 public class PlimEventHandler {
     @SubscribeEvent

@@ -26,7 +26,8 @@ public class WrappedInventory {
                 this.slots[i] = itemStack.copy();
                 itemStack.stackSize = 0;
                 break;
-            } else if (this.slots[i].getItem().equals(itemStack.getItem())) {
+            }
+            else if (this.slots[i].getItem().equals(itemStack.getItem())) {
                 for (int j = 0; j < this.slots[i].getMaxStackSize(); j++) {
                     this.slots[i].stackSize++;
                     itemStack.stackSize--;
@@ -45,7 +46,8 @@ public class WrappedInventory {
         for (int i = 0; i < this.slots.length; i++) {
             if (slots[i] == null) {
                 full = false;
-            } else {
+            }
+            else {
                 if (slots[i].stackSize < slots[i].getMaxStackSize()) {
                     full = false;
                 }
@@ -77,7 +79,8 @@ public class WrappedInventory {
                 itemStack = itemStacks[slot];
                 itemStacks[slot] = null;
                 return itemStack;
-            } else {
+            }
+            else {
                 itemStack = itemStacks[slot].splitStack(num);
 
                 if (itemStacks[slot].stackSize == 0) {
@@ -86,7 +89,8 @@ public class WrappedInventory {
 
                 return itemStack;
             }
-        } else {
+        }
+        else {
             return null;
         }
     }

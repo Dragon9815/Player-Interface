@@ -1,14 +1,11 @@
 package net.dragon9815.playerinterfacemod.item;
 
 import net.dragon9815.dragoncore.item.ItemBase;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+import net.dragon9815.playerinterfacemod.creativetab.CreativeTabPlim;
+import net.dragon9815.playerinterfacemod.reference.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.dragon9815.playerinterfacemod.PlayerInterfaceMod;
-import net.dragon9815.playerinterfacemod.client.gui.GuiSideConfig;
-import net.dragon9815.playerinterfacemod.creativetab.CreativeTabPlim;
-import net.dragon9815.playerinterfacemod.reference.Reference;
 
 public class ItemWrench extends ItemBase {
     public ItemWrench() {

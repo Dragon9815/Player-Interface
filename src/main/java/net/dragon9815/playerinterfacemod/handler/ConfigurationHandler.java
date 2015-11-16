@@ -3,8 +3,8 @@ package net.dragon9815.playerinterfacemod.handler;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.common.config.Configuration;
 import net.dragon9815.playerinterfacemod.reference.Reference;
+import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 
