@@ -14,5 +14,5 @@ public abstract class GridBlock extends Block {
     }
 
     protected abstract String getName();
-    protected abstract GridTileEntity getTileEntity();
+    protected abstract GridTileEntity getTileEntity(int x, int y, int z);
 }

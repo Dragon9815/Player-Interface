@@ -1,7 +1,11 @@
 package net.dragon9815.playerinterfacemod.grid;
 
+import net.dragon9815.playerinterfacemod.block.GridBlock;
+
 public interface IGridNode {
-    public int getX();
-    public int getY();
-    public int getZ();
+    int getX();
+    int getY();
+    int getZ();
+
+    GridBlock getGridBlock();
 }

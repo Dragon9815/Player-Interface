@@ -1,5 +1,6 @@
 package net.dragon9815.playerinterfacemod.client.renderer.item;
 
+import net.dragon9815.playerinterfacemod.helpers.LogHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -27,6 +28,7 @@ public class ItemPlayerInterfaceRenderer implements IItemRenderer {
 
     @Override
     public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
+        LogHelper.info("Type: " + type.name());
         if (type == ItemRenderType.ENTITY) {
             GL11.glTranslatef(-0.5F, 0.0F, -0.5F);
         }

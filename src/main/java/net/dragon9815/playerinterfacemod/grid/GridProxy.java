@@ -1,7 +1,16 @@
 package net.dragon9815.playerinterfacemod.grid;
 
-/**
- * Created by Stefan on 15.11.2015.
- */
+import java.util.ArrayList;
+
 public class GridProxy {
+    public static GridProxy INSTANCE = new GridProxy();
+    private ArrayList<Grid> grids;
+
+    public GridProxy() {
+        grids = new ArrayList<Grid>();
+    }
+
+    public void addGrid(Grid g) {
+        grids.add(g);
+    }
 }
