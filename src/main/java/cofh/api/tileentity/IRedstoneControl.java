@@ -5,53 +5,52 @@ package cofh.api.tileentity;
  * respond to a low or high redstone state.
  *
  * @author King Lemming
- *
  */
 public interface IRedstoneControl extends IRedstoneCache {
 
-	public static enum ControlMode {
-		DISABLED(true), LOW(false), HIGH(true);
+    ControlMode getControl();
 
-		private final boolean state;
+    void setControl(ControlMode control);
 
-		private ControlMode(boolean state) {
+    public static enum ControlMode {
+        DISABLED(true), LOW(false), HIGH(true);
 
-			this.state = state;
-		}
+        private final boolean state;
 
-		public boolean isDisabled() {
+        private ControlMode(boolean state) {
 
-			return this == DISABLED;
-		}
+            this.state = state;
+        }
 
-		public boolean isLow() {
+        public static ControlMode stepForward(ControlMode curControl) {
 
-			return this == LOW;
-		}
+            return curControl == DISABLED ? LOW : curControl == HIGH ? DISABLED : HIGH;
+        }
 
-		public boolean isHigh() {
+        public static ControlMode stepBackward(ControlMode curControl) {
 
-			return this == HIGH;
-		}
+            return curControl == DISABLED ? HIGH : curControl == HIGH ? LOW : DISABLED;
+        }
 
-		public boolean getState() {
+        public boolean isDisabled() {
 
-			return state;
-		}
+            return this == DISABLED;
+        }
 
-		public static ControlMode stepForward(ControlMode curControl) {
+        public boolean isLow() {
 
-			return curControl == DISABLED ? LOW : curControl == HIGH ? DISABLED : HIGH;
-		}
+            return this == LOW;
+        }
 
-		public static ControlMode stepBackward(ControlMode curControl) {
+        public boolean isHigh() {
 
-			return curControl == DISABLED ? HIGH : curControl == HIGH ? LOW : DISABLED;
-		}
-	}
+            return this == HIGH;
+        }
 
-	void setControl(ControlMode control);
+        public boolean getState() {
 
-	ControlMode getControl();
+            return state;
+        }
+    }
 
 }

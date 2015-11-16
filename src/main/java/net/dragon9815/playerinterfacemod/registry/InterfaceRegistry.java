@@ -1,9 +1,9 @@
 package net.dragon9815.playerinterfacemod.registry;
 
+import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 
 import java.util.LinkedList;
 import java.util.UUID;

@@ -35,7 +35,8 @@ public interface IToolHammer {
 	 * @param x
 	 *            X location of the block/tile
 	 * @param y
-	 *            Y location of the block/tile
+	 *            Y location o
+    the block/tile
 	 * @param z
 	 *            Z location of the block/tile
 	 */

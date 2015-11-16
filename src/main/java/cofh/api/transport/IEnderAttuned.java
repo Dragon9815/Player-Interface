@@ -2,12 +2,12 @@ package cofh.api.transport;
 
 interface IEnderAttuned {
 
-	public String getChannelString();
+    public String getChannelString();
 
-	public int getFrequency();
+    public int getFrequency();
 
-	public boolean setFrequency(int frequency);
+    public boolean setFrequency(int frequency);
 
-	public boolean clearFrequency();
+    public boolean clearFrequency();
 
 }

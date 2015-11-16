@@ -7,7 +7,13 @@ import net.dragon9815.dragoncore.block.BlockUpgradeable;
 import net.dragon9815.dragoncore.registry.UpgradeRegistry;
 import net.dragon9815.playerinterfacemod.PlayerInterfaceMod;
 import net.dragon9815.playerinterfacemod.client.gui.GuiSideConfig;
+import net.dragon9815.playerinterfacemod.creativetab.CreativeTabPlim;
 import net.dragon9815.playerinterfacemod.item.ItemWrench;
+import net.dragon9815.playerinterfacemod.reference.MachineNames;
+import net.dragon9815.playerinterfacemod.reference.Reference;
+import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
+import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+import net.dragon9815.playerinterfacemod.utility.Platform;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -19,12 +25,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.dragon9815.playerinterfacemod.creativetab.CreativeTabPlim;
-import net.dragon9815.playerinterfacemod.reference.MachineNames;
-import net.dragon9815.playerinterfacemod.reference.Reference;
-import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
-import net.dragon9815.playerinterfacemod.utility.Platform;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -63,7 +63,7 @@ public class BlockPlayerInterface extends BlockUpgradeable implements IDismantle
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float par7, float par8, float par9) {
         super.onBlockActivated(world, x, y, z, player, meta, par7, par8, par9);
 
-        if(player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemWrench) {
+        if (player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemWrench) {
             player.openGui(PlayerInterfaceMod.instance, GuiSideConfig.GUI_ID, world, x, y, z);
             return true;
         }
@@ -77,14 +77,12 @@ public class BlockPlayerInterface extends BlockUpgradeable implements IDismantle
     }
 
     @Override // TODO: Fix CoFH dismantle Block
-    public ArrayList<ItemStack> dismantleBlock(EntityPlayer player, World world, int x, int y, int z, boolean returnDrops)
-    {
+    public ArrayList<ItemStack> dismantleBlock(EntityPlayer player, World world, int x, int y, int z, boolean returnDrops) {
         return new ArrayList<ItemStack>();
     }
 
     @Override
-    public boolean canDismantle(EntityPlayer player, World world, int x, int y, int z)
-    {
+    public boolean canDismantle(EntityPlayer player, World world, int x, int y, int z) {
         return true;
     }
 

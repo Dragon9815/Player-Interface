@@ -1,17 +1,10 @@
 package net.dragon9815.playerinterfacemod.inventory;
 
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-
-import javax.swing.text.html.parser.Entity;
-import java.lang.ref.WeakReference;
 
 public class InventoryTrash implements IInventory {
     public ItemStack[] inventory = new ItemStack[27];
@@ -37,25 +30,21 @@ public class InventoryTrash implements IInventory {
 
     @Override
     public ItemStack decrStackSize(int slot, int quantity) {
-        if (inventory[slot] != null)
-        {
-            if (inventory[slot].stackSize <= quantity)
-            {
+        if (inventory[slot] != null) {
+            if (inventory[slot].stackSize <= quantity) {
                 ItemStack stack = inventory[slot];
                 inventory[slot] = null;
                 return stack;
             }
 
             ItemStack split = inventory[slot].splitStack(quantity);
-            if (inventory[slot].stackSize == 0)
-            {
+            if (inventory[slot].stackSize == 0) {
                 inventory[slot] = null;
             }
 
             return split;
         }
-        else
-        {
+        else {
             return null;
         }
     }
@@ -69,8 +58,7 @@ public class InventoryTrash implements IInventory {
     public void setInventorySlotContents(int slot, ItemStack itemStack) {
         inventory[slot] = itemStack;
 
-        if (itemStack != null && itemStack.stackSize > getInventoryStackLimit())
-        {
+        if (itemStack != null && itemStack.stackSize > getInventoryStackLimit()) {
             itemStack.stackSize = getInventoryStackLimit();
         }
     }
@@ -115,15 +103,12 @@ public class InventoryTrash implements IInventory {
         return false;
     }
 
-    public void saveToNBT (NBTTagCompound tagCompound)
-    {
+    public void saveToNBT(NBTTagCompound tagCompound) {
         NBTTagList tagList = new NBTTagList();
         NBTTagCompound invSlot;
 
-        for (int i = 0; i < this.inventory.length; ++i)
-        {
-            if (this.inventory[i] != null)
-            {
+        for (int i = 0; i < this.inventory.length; ++i) {
+            if (this.inventory[i] != null) {
                 invSlot = new NBTTagCompound();
                 invSlot.setByte("Slot", (byte) i);
                 this.inventory[i].writeToNBT(invSlot);
@@ -134,19 +119,15 @@ public class InventoryTrash implements IInventory {
         tagCompound.setTag("Inventory", tagList);
     }
 
-    public void readFromNBT (NBTTagCompound tagCompound)
-    {
-        if (tagCompound != null)
-        {
+    public void readFromNBT(NBTTagCompound tagCompound) {
+        if (tagCompound != null) {
             NBTTagList tagList = tagCompound.getTagList("Inventory", 10);
-            for (int i = 0; i < tagList.tagCount(); ++i)
-            {
+            for (int i = 0; i < tagList.tagCount(); ++i) {
                 NBTTagCompound nbttagcompound = (NBTTagCompound) tagList.getCompoundTagAt(i);
                 int j = nbttagcompound.getByte("Slot") & 255;
                 ItemStack itemstack = ItemStack.loadItemStackFromNBT(nbttagcompound);
 
-                if (itemstack != null)
-                {
+                if (itemstack != null) {
                     this.inventory[j] = itemstack;
                 }
             }

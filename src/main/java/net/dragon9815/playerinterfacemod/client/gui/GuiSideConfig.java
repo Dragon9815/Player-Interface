@@ -1,28 +1,20 @@
 package net.dragon9815.playerinterfacemod.client.gui;
 
 import net.dragon9815.dragoncore.helpers.LogHelper;
-import net.dragon9815.playerinterfacemod.container.ContainerPlayerInterface;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
+import net.dragon9815.playerinterfacemod.inventory.ContainerPlayerInterface;
 import net.dragon9815.playerinterfacemod.reference.Reference;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
+import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 public class GuiSideConfig extends GuiContainer {
     public static final int GUI_ID = 1;
-
+    private static final ResourceLocation texture = new ResourceLocation(Reference.MOD_ID, "textures/gui/side_config.png");
     private int xSize = 176;
     private int ySize = 166;
     private int xPos;
     private int yPos;
-
-    private static final ResourceLocation texture = new ResourceLocation(Reference.MOD_ID, "textures/gui/side_config.png");
-
     private TileEntityPlayerInterface playerInterface;
 
     public GuiSideConfig(ContainerPlayerInterface container, TileEntityPlayerInterface playerInterface) {
@@ -53,20 +45,18 @@ public class GuiSideConfig extends GuiContainer {
     }
 
     @Override
-    public boolean doesGuiPauseGame()
-    {
+    public boolean doesGuiPauseGame() {
         return false;
     }
 
     @Override
-    protected void mouseClicked(int x, int y, int par3)
-    {
+    protected void mouseClicked(int x, int y, int par3) {
         super.mouseClicked(x, y, par3);
 
         int mouseX = (x - this.xPos);
         int mouseY = (y - this.yPos);
 
-        if(mouseX > 0 && mouseY > 0 && mouseX <= this.xSize && mouseY <= this.ySize) {
+        if (mouseX > 0 && mouseY > 0 && mouseX <= this.xSize && mouseY <= this.ySize) {
             LogHelper.info(">>> x: " + mouseX + ", y: " + mouseY);
         }
     }

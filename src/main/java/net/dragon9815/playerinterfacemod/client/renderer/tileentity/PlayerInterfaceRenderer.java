@@ -1,6 +1,9 @@
 package net.dragon9815.playerinterfacemod.client.renderer.tileentity;
 
 import cofh.api.transport.IItemDuct;
+import net.dragon9815.playerinterfacemod.client.model.ModelPlayerInterface;
+import net.dragon9815.playerinterfacemod.helpers.BlockHelper;
+import net.dragon9815.playerinterfacemod.reference.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHopper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -8,9 +11,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.dragon9815.playerinterfacemod.client.model.ModelPlayerInterface;
-import net.dragon9815.playerinterfacemod.helpers.BlockHelper;
-import net.dragon9815.playerinterfacemod.reference.Reference;
 import org.lwjgl.opengl.GL11;
 
 public class PlayerInterfaceRenderer extends TileEntitySpecialRenderer {

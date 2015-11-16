@@ -3,13 +3,13 @@ package net.dragon9815.playerinterfacemod.integration.waila.tile;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.dragon9815.dragoncore.helpers.StringHelper;
+import net.dragon9815.playerinterfacemod.integration.waila.BaseWailaDataProvider;
+import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.dragon9815.playerinterfacemod.integration.waila.BaseWailaDataProvider;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 
 import java.util.List;
 

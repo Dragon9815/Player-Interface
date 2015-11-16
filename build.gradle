@@ -20,7 +20,7 @@ apply plugin: 'forge'
 logger.lifecycle "Build number: ${artifactBuildNumber}"
 
 version = "${minecraft_version}-${artifactMajorVersion}-${artifactBuildNumber}"
-group= "net.dragon9815.playerinterfacemod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "net.dragon9815.playerinterfacemod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "PlayerInterfaceMod"
 
 minecraft {
@@ -36,12 +36,12 @@ repositories {
 }
 
 dependencies {
-	compile("mcp.mobius.waila:Waila:${waila_version}_${minecraft_version}:dev") {
+    compile("mcp.mobius.waila:Waila:${waila_version}_${minecraft_version}:dev") {
         exclude group: 'mcp.mobius.waila'
     }
-	
-	// compile(files('libs/CoFHLib-[1.7.10]1.0.3-175-dev.jar'))
-	compile(files("libs/DragonCore-${dragoncore_version}-dev.jar"))
+
+    // compile(files('libs/CoFHLib-[1.7.10]1.0.3-175-dev.jar'))
+    compile(files("libs/DragonCore-${dragoncore_version}-dev.jar"))
 }
 
 jar {
@@ -51,24 +51,24 @@ jar {
 }
 
 processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+        {
+            // this will ensure that this task is redone when the versions change.
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
+            // replace stuff in mcmod.info, nothing else
+            from(sourceSets.main.resources.srcDirs) {
+                include 'mcmod.info'
+
+                // replace version and mcversion
+                expand 'version': project.version, 'mcversion': project.minecraft.version
+            }
+
+            // copy everything else, thats not the mcmod.info
+            from(sourceSets.main.resources.srcDirs) {
+                exclude 'mcmod.info'
+            }
+        }
 
 task devJar(type: Jar, dependsOn: 'jar') {
 
@@ -82,18 +82,18 @@ task devJar(type: Jar, dependsOn: 'jar') {
 }
 
 task increaseBuildBumber << {
-	Properties props = new Properties()
-	File propsFile = new File('gradle.properties')
-	props.load(propsFile.newDataInputStream())
+    Properties props = new Properties()
+    File propsFile = new File('gradle.properties')
+    props.load(propsFile.newDataInputStream())
 
-	Integer next_buildnumber = ( (props.getProperty('artifactBuildNumber') as BigDecimal) + 1 )
-	props.setProperty('artifactBuildNumber', next_buildnumber.toString())
+    Integer next_buildnumber = ((props.getProperty('artifactBuildNumber') as BigDecimal) + 1)
+    props.setProperty('artifactBuildNumber', next_buildnumber.toString())
 
-	props.store(propsFile.newWriter(), null)
+    props.store(propsFile.newWriter(), null)
 }
 
 artifacts {
-	archives devJar
+    archives devJar
 }
 
 //tasks.build.dependsOn('devJar')

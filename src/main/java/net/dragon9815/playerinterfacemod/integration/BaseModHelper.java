@@ -4,7 +4,7 @@ import cpw.mods.fml.common.Loader;
 import net.dragon9815.playerinterfacemod.helpers.LogHelper;
 
 public abstract class BaseModHelper {
-    protected boolean loaded;
+    public boolean loaded;
 
     public BaseModHelper() {
         this.loaded = false;
@@ -17,11 +17,11 @@ public abstract class BaseModHelper {
     public void init() {
         if (Loader.isModLoaded(this.getModId())) {
             try {
-                this.load();
+                this.loaded = this.load();
 
                 LogHelper.info("ModHelper loaded for " + this.getModId());
-                this.loaded = true;
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -31,8 +31,8 @@ public abstract class BaseModHelper {
         }
     }
 
-    public void load() throws Exception {
-
+    public boolean load() throws Exception {
+        return false;
     }
 
     protected abstract String getModId();
