@@ -2,7 +2,7 @@ package net.dragon9815.playerinterfacemod.grid;
 
 import java.util.ArrayList;
 
-public class GridProxy {
+public class  GridProxy {
     public static GridProxy INSTANCE = new GridProxy();
     private ArrayList<Grid> grids;
 

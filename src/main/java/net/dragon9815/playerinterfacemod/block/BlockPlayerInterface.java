@@ -14,7 +14,6 @@ import net.dragon9815.playerinterfacemod.reference.MachineNames;
 import net.dragon9815.playerinterfacemod.reference.Reference;
 import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
 import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
-import net.dragon9815.playerinterfacemod.utility.Platform;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
@@ -26,14 +25,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
-<<<<<<< Updated upstream
-=======
-import net.dragon9815.playerinterfacemod.creativetab.CreativeTabPlim;
-import net.dragon9815.playerinterfacemod.reference.MachineNames;
-import net.dragon9815.playerinterfacemod.reference.Reference;
-import net.dragon9815.playerinterfacemod.reference.UpgradeNames;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
->>>>>>> Stashed changes
 
 import java.util.ArrayList;
 import java.util.Random;

@@ -5,10 +5,10 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
+import net.dragon9815.dragoncore.util.Platform;
 import net.dragon9815.playerinterfacemod.PlayerInterfaceMod;
 import net.dragon9815.playerinterfacemod.helpers.LogHelper;
 import net.dragon9815.playerinterfacemod.helpers.PlayerHelper;
-import net.dragon9815.playerinterfacemod.utility.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 

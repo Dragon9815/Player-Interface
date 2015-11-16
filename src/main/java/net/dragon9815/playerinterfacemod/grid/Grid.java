@@ -19,6 +19,6 @@ public class Grid {
     }
 
     public void removeNode(Position pos) {
-        this.e
+        this.connectedNodes.remove(pos);
     }
 }

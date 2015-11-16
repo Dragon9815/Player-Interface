@@ -13,12 +13,9 @@ public abstract class CommonProxy implements IProxy, IGuiHandler {
     public void intermodComm() {
     }
 
-<<<<<<< Updated upstream
     public void registerRenderers() {
     }
 
-=======
->>>>>>> Stashed changes
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID == GuiTrashInventory.GUI_ID) {
