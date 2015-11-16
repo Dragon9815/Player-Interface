@@ -1,10 +1,10 @@
-package net.dragon9815.playerinterfacemod.container;
+package net.dragon9815.playerinterfacemod.inventory;
 
+import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.dragon9815.playerinterfacemod.tileentity.TileEntityPlayerInterface;
 
 public class ContainerPlayerInterface extends Container {
     private TileEntityPlayerInterface tilePlayerInterface;

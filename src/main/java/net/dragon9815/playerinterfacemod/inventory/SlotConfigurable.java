@@ -1,4 +1,4 @@
-package net.dragon9815.playerinterfacemod.container;
+package net.dragon9815.playerinterfacemod.inventory;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;

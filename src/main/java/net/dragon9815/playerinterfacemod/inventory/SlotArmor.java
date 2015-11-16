@@ -1,4 +1,4 @@
-package net.dragon9815.playerinterfacemod.container;
+package net.dragon9815.playerinterfacemod.inventory;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -31,8 +31,8 @@ public class SlotArmor extends Slot {
         Item item = (itemStack == null) ? null : itemStack.getItem();
 
         boolean isValidArmor = false;
-        if(item instanceof ItemArmor) {
-            isValidArmor = ((ItemArmor)item).armorType == armorType;
+        if (item instanceof ItemArmor) {
+            isValidArmor = ((ItemArmor) item).armorType == armorType;
         }
 
         return isValidArmor;
