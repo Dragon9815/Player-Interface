@@ -1,6 +1,6 @@
 package net.dragon9815.playerinterfacemod.block;
 
-import net.dragon9815.playerinterfacemod.tileentity.GridTileEntity;
+import net.dragon9815.playerinterfacemod.grid.IGridNode;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 
@@ -12,7 +12,4 @@ public abstract class GridBlock extends Block {
     public GridBlock() {
         super(Material.iron);
     }
-
-    protected abstract String getName();
-    protected abstract GridTileEntity getTileEntity(int x, int y, int z);
 }
