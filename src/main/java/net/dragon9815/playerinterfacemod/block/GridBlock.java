@@ -1,6 +1,5 @@
 package net.dragon9815.playerinterfacemod.block;
 
-import net.dragon9815.playerinterfacemod.grid.IGridNode;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 
@@ -12,4 +11,6 @@ public abstract class GridBlock extends Block {
     public GridBlock() {
         super(Material.iron);
     }
+
+    public abstract GridBlock[] getRequirements();
 }
